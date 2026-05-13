@@ -1,12 +1,12 @@
 'use client';
 
-import { useEffect, useState, use } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { api } from '@/lib/api';
 import { useAuthStore } from '@/lib/store';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { Loader2, ArrowLeft, AlertCircle, Trash2, MousePointerClick, HelpCircle, X } from 'lucide-react';
 import Link from 'next/link';
 import { DomPickerModal } from '@/components/monitors/DomPickerModal';
@@ -32,10 +32,9 @@ const frequencies = [
   { value: 10080, label: '7 days', pro: false },
 ];
 
-export default function EditMonitorPage({ params }: { params: Promise<{ id: string }> }) {
-  const resolvedParams = use(params);
-  const { id } = resolvedParams;
-
+export default function EditMonitorPage() {
+  const params = useParams();
+  const id = String(params?.id ?? '');
   const router = useRouter();
   const { user } = useAuthStore();
   const [error, setError] = useState<string | null>(null);
@@ -51,6 +50,11 @@ export default function EditMonitorPage({ params }: { params: Promise<{ id: stri
   });
 
   useEffect(() => {
+    if (!id) {
+      setLoading(false);
+      setError('Invalid monitor link');
+      return;
+    }
     const fetchMonitor = async () => {
       try {
         const { data } = await api.get(`/monitors/${id}`);

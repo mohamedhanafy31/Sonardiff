@@ -111,9 +111,16 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const pathname = usePathname();
   const { isAuthenticated, isLoading, checkAuth, logout, user } = useAuthStore();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [maintenanceBanner, setMaintenanceBanner] = useState<{ mode: boolean; message: string } | null>(null);
 
   useEffect(() => {
     checkAuth();
+    fetch('/api/admin/config/public')
+      .then(r => r.json())
+      .then((d: { maintenanceMode?: boolean; maintenanceMessage?: string }) => {
+        if (d.maintenanceMode) setMaintenanceBanner({ mode: true, message: d.maintenanceMessage ?? '' });
+      })
+      .catch(() => {});
   }, [checkAuth]);
 
   useEffect(() => {
@@ -162,7 +169,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     : '??';
 
   return (
-    <div className="min-h-screen bg-bg-soft text-foreground flex relative">
+    <div className="min-h-screen bg-bg-soft text-foreground flex relative flex-col">
+      {maintenanceBanner?.mode && (
+        <div className="bg-yellow-500/15 border-b border-yellow-500/30 px-6 py-2.5 text-[13px] text-yellow-400 font-medium text-center shrink-0">
+          Maintenance in progress — some features are temporarily unavailable.
+          {maintenanceBanner.message && ` ${maintenanceBanner.message}`}
+        </div>
+      )}
+      <div className="flex flex-1 min-h-0 relative">
       <GlobalSearch />
 
       {/* Mobile Backdrop */}
@@ -330,6 +344,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
         </div>
       </main>
+      </div>
     </div>
   );
 }

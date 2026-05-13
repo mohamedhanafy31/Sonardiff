@@ -14,7 +14,10 @@ export const config = {
   resendFrom: process.env.RESEND_FROM || 'hanafy@sonardiff.com',
 
   proxyUrl: process.env.PROXY_URL || '',
+  /** Operator login for `/api/admin/*` — both must be set in `.env` for admin login to work. */
+  adminUsername: (process.env.ADMIN_USERNAME || '').trim(),
   adminPassword: process.env.ADMIN_PASSWORD || '',
+  adminEmail: process.env.ADMIN_EMAIL || '',
 
   // Plan limits
   plans: {

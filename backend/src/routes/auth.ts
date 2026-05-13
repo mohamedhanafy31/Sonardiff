@@ -11,6 +11,7 @@ import {
 import { config } from '../lib/config.js';
 import { requireAuth } from '../middlewares/requireAuth.js';
 import { logger } from '../lib/logger.js';
+import { sendAuthRouteError } from '../lib/authErrors.js';
 
 const router: ReturnType<typeof Router> = Router();
 
@@ -20,6 +21,14 @@ router.get('/test', (req, res) => { res.json({ msg: 'auth router works' }) });
 // --- POST /api/auth/register ---
 router.post('/register', async (req: Request, res: Response) => {
   try {
+    // Feature flag: registration_open
+    const { getConfigFlag } = await import('./admin/config.js');
+    const registrationOpen = await getConfigFlag('registration_open');
+    if (registrationOpen === 'false') {
+      res.status(503).json({ error: 'Registration is temporarily disabled.', maintenance: true });
+      return;
+    }
+
     const { email, password, name, plan } = req.body;
 
     // Validate input
@@ -86,7 +95,7 @@ router.post('/register', async (req: Request, res: Response) => {
     });
   } catch (err) {
     logger.error({ err }, 'Registration error');
-    res.status(500).json({ error: 'Internal server error' });
+    sendAuthRouteError(res, err, 'register');
   }
 });
 
@@ -112,8 +121,21 @@ router.post('/login', async (req: Request, res: Response) => {
       return;
     }
 
-    // Verify password
-    const valid = await verifyPassword(password, user.passwordHash);
+    // Verify password (guard corrupt rows)
+    if (!user.passwordHash || typeof user.passwordHash !== 'string') {
+      logger.error({ userId: user.id }, 'Login failed: missing password hash');
+      res.status(401).json({ error: 'Invalid email or password' });
+      return;
+    }
+
+    let valid = false;
+    try {
+      valid = await verifyPassword(password, user.passwordHash);
+    } catch (verifyErr) {
+      logger.error({ err: verifyErr, userId: user.id }, 'Password verify threw');
+      sendAuthRouteError(res, verifyErr, 'login-verify');
+      return;
+    }
     if (!valid) {
       res.status(401).json({ error: 'Invalid email or password' });
       return;
@@ -138,7 +160,7 @@ router.post('/login', async (req: Request, res: Response) => {
     });
   } catch (err) {
     logger.error({ err }, 'Login error');
-    res.status(500).json({ error: 'Internal server error' });
+    sendAuthRouteError(res, err, 'login');
   }
 });
 

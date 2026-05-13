@@ -36,6 +36,13 @@
       "when": 1778668826427,
       "tag": "0004_gigantic_vance_astro",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1778699448990,
+      "tag": "0005_tiny_master_chief",
+      "breakpoints": true
     }
   ]
 }

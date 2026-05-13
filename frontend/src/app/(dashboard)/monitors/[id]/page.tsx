@@ -1,14 +1,15 @@
 'use client';
 
-import { useEffect, useState, use } from 'react';
+import { useEffect, useState } from 'react';
+import { useParams } from 'next/navigation';
 import { api } from '@/lib/api';
 import Link from 'next/link';
 import { ArrowLeft, Clock, ExternalLink, Play, Loader2, Settings2, CheckCircle, AlertCircle } from 'lucide-react';
 import { useAuthStore } from '@/lib/store';
 
-export default function MonitorDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const resolvedParams = use(params);
-  const { id } = resolvedParams;
+export default function MonitorDetailPage() {
+  const params = useParams();
+  const id = String(params?.id ?? '');
 
   const { user } = useAuthStore();
   const [monitor, setMonitor] = useState<any>(null);
@@ -19,6 +20,10 @@ export default function MonitorDetailPage({ params }: { params: Promise<{ id: st
   const [checkToast, setCheckToast] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   useEffect(() => {
+    if (!id) {
+      setLoading(false);
+      return;
+    }
     const fetchData = async () => {
       try {
         const [monitorRes, diffsRes] = await Promise.all([
@@ -52,6 +57,12 @@ export default function MonitorDetailPage({ params }: { params: Promise<{ id: st
       setTimeout(() => setCheckToast(null), 5000);
     }
   };
+
+  if (!id) {
+    return (
+      <div className="max-w-md mx-auto mt-20 text-center text-ink-3 text-sm">Invalid monitor link.</div>
+    );
+  }
 
   if (loading) {
     return (

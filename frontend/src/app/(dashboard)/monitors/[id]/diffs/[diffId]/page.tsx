@@ -1,14 +1,17 @@
 'use client';
 
-import { useEffect, useState, use } from 'react';
+import { useEffect, useState } from 'react';
+import { useParams } from 'next/navigation';
 import { api } from '@/lib/api';
 import Link from 'next/link';
 import { ArrowLeft, Eye, Code, Calendar, AlertCircle, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { AuthenticatedSnapshotImage } from '@/components/AuthenticatedSnapshotImage';
 
-export default function DiffViewerPage({ params }: { params: Promise<{ id: string; diffId: string }> }) {
-  const resolvedParams = use(params);
-  const { id, diffId } = resolvedParams;
+export default function DiffViewerPage() {
+  const params = useParams();
+  const id = String(params?.id ?? '');
+  const diffId = String(params?.diffId ?? '');
 
   const [monitor, setMonitor] = useState<any>(null);
   const [diff, setDiff] = useState<any>(null);
@@ -16,12 +19,16 @@ export default function DiffViewerPage({ params }: { params: Promise<{ id: strin
   const [activeTab, setActiveTab] = useState<'visual' | 'text'>('text');
 
   useEffect(() => {
+    if (!id || !diffId) {
+      setLoading(false);
+      return;
+    }
     const fetchDiff = async () => {
       try {
         const { data } = await api.get(`/monitors/${id}/diffs/${diffId}`);
         setMonitor(data.monitor);
         setDiff(data.diff);
-        if (data.diff.snapshotNew?.screenshotUrl) {
+        if (data.diff?.snapshotNew?.screenshotUrl) {
           setActiveTab('visual');
         }
       } catch (err) {
@@ -33,6 +40,10 @@ export default function DiffViewerPage({ params }: { params: Promise<{ id: strin
     fetchDiff();
   }, [id, diffId]);
 
+  if (!id || !diffId) {
+    return <div className="text-ink-3">Invalid diff link.</div>;
+  }
+
   if (loading) {
     return (
       <div className="flex justify-center py-20">
@@ -43,7 +54,7 @@ export default function DiffViewerPage({ params }: { params: Promise<{ id: strin
 
   if (!diff) return <div className="text-ink-3">Diff not found.</div>;
 
-  const isExpired = new Date(diff.expiresAt) < new Date();
+  const isExpired = diff.expiresAt ? new Date(diff.expiresAt) < new Date() : false;
 
   return (
     <div>
@@ -59,9 +70,14 @@ export default function DiffViewerPage({ params }: { params: Promise<{ id: strin
             </h1>
             <p className="text-ink-4 text-[13px] mt-0.5 flex items-center gap-1.5">
               <Calendar className="w-3 h-3" />
-              Detected {new Date(diff.detectedAt).toLocaleString()}
+              Detected {diff.detectedAt ? new Date(diff.detectedAt).toLocaleString() : '—'}
               <span className="mx-1">·</span>
-              <span className="font-mono text-accent-2">{Number(diff.changePercentage).toFixed(2)}% change</span>
+              <span className="font-mono text-accent-2">
+                {Number.isFinite(Number(diff.changePercentage))
+                  ? Number(diff.changePercentage).toFixed(2)
+                  : '0.00'}
+                % change
+              </span>
             </p>
           </div>
         </div>
@@ -104,10 +120,10 @@ export default function DiffViewerPage({ params }: { params: Promise<{ id: strin
             <h3 className="text-[11.5px] uppercase tracking-[0.08em] text-ink-4 font-semibold mb-3">Before</h3>
             <div className="bg-bg-card border border-line rounded-[14px] overflow-hidden aspect-video relative">
               {diff.snapshotOld?.screenshotUrl ? (
-                <img
-                  src={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}${diff.snapshotOld.screenshotUrl}`}
+                <AuthenticatedSnapshotImage
+                  src={diff.snapshotOld.screenshotUrl}
                   alt="Previous State"
-                  className="w-full h-full object-cover"
+                  className="absolute inset-0 w-full h-full object-cover"
                 />
               ) : (
                 <div className="absolute inset-0 flex items-center justify-center text-ink-4 text-sm">No screenshot</div>
@@ -118,10 +134,10 @@ export default function DiffViewerPage({ params }: { params: Promise<{ id: strin
             <h3 className="text-[11.5px] uppercase tracking-[0.08em] text-ink-4 font-semibold mb-3">After</h3>
             <div className="bg-bg-card border border-line rounded-[14px] overflow-hidden aspect-video relative">
               {diff.snapshotNew?.screenshotUrl ? (
-                <img
-                  src={`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001'}${diff.snapshotNew.screenshotUrl}`}
+                <AuthenticatedSnapshotImage
+                  src={diff.snapshotNew.screenshotUrl}
                   alt="New State"
-                  className="w-full h-full object-cover"
+                  className="absolute inset-0 w-full h-full object-cover"
                 />
               ) : (
                 <div className="absolute inset-0 flex items-center justify-center text-ink-4 text-sm">No screenshot</div>
@@ -144,7 +160,10 @@ export default function DiffViewerPage({ params }: { params: Promise<{ id: strin
               </div>
             </div>
             <div className="text-accent-2 font-mono text-[12px] font-medium">
-              {Number(diff.changePercentage).toFixed(2)}% change
+              {Number.isFinite(Number(diff.changePercentage))
+                ? Number(diff.changePercentage).toFixed(2)
+                : '0.00'}
+              % change
             </div>
           </div>
 
@@ -152,26 +171,28 @@ export default function DiffViewerPage({ params }: { params: Promise<{ id: strin
           <div className="flex-1 overflow-auto p-4 bg-[#0B0F14] font-mono text-[13px] leading-relaxed">
             {diff.diffData && Array.isArray(diff.diffData) ? (
               <div className="space-y-px">
-                {diff.diffData.map((part: any, idx: number) => {
-                  const lines = part.value.split('\n');
-                  return lines.map((line: string, lineIdx: number) => {
-                    if (line === '' && lineIdx === lines.length - 1) return null;
-                    return (
+                {diff.diffData.flatMap((part: unknown, idx: number) => {
+                  const p = part as { value?: string; added?: boolean; removed?: boolean };
+                  const raw = typeof p?.value === 'string' ? p.value : '';
+                  const lines = raw.split('\n');
+                  return lines.flatMap((line: string, lineIdx: number) => {
+                    if (line === '' && lineIdx === lines.length - 1) return [];
+                    return [
                       <div
                         key={`${idx}-${lineIdx}`}
                         className={cn(
-                          "px-4 py-0.5 rounded-sm flex",
-                          part.added ? "bg-[rgba(16,185,129,0.12)] text-[#6EE7B7]" :
-                          part.removed ? "bg-[rgba(239,68,68,0.12)] text-[#FCA5A5]" :
-                          "text-[#94A3B8]/60"
+                          'px-4 py-0.5 rounded-sm flex',
+                          p.added ? 'bg-[rgba(16,185,129,0.12)] text-[#6EE7B7]' :
+                          p.removed ? 'bg-[rgba(239,68,68,0.12)] text-[#FCA5A5]' :
+                          'text-[#94A3B8]/60'
                         )}
                       >
                         <span className="select-none inline-block w-6 text-[#64748B] border-r border-[rgba(255,255,255,0.06)] mr-3 pr-1 text-right text-[11px]">
-                          {part.added ? '+' : part.removed ? '-' : ' '}
+                          {p.added ? '+' : p.removed ? '-' : ' '}
                         </span>
                         <span className="whitespace-pre-wrap break-all">{line || ' '}</span>
-                      </div>
-                    );
+                      </div>,
+                    ];
                   });
                 })}
               </div>

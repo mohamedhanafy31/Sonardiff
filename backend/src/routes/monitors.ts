@@ -649,6 +649,14 @@ router.get('/:id/diffs/:diffId', async (req: Request, res: Response) => {
 // --- POST /api/monitors/:id/check ---
 router.post('/:id/check', async (req: Request, res: Response) => {
   try {
+    // Feature flag: manual_check_enabled
+    const { getConfigFlag } = await import('./admin/config.js');
+    const manualEnabled = await getConfigFlag('manual_check_enabled');
+    if (manualEnabled === 'false') {
+      res.status(503).json({ error: 'Manual checks are temporarily disabled.', maintenance: true });
+      return;
+    }
+
     const user = req.user!;
     const [monitor] = await db
       .select()

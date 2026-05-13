@@ -1,5 +1,5 @@
 import { chromium } from 'playwright-extra';
-import type { Browser, Route } from 'playwright';
+import type { Route } from 'playwright';
 // @ts-ignore - Stealth plugin lacks perfect TS exports
 import stealthPlugin from 'puppeteer-extra-plugin-stealth';
 import * as cheerio from 'cheerio';
@@ -125,6 +125,68 @@ function isJsHeavy(html: string): boolean {
 function isBotBlocked(html: string, status: number | null): boolean {
   if (status === 403 || status === 503) return true;
   return BOT_SIGNALS.some(signal => html.includes(signal));
+}
+
+/** Resolve relative URLs when rendering fetched HTML in an offline page. */
+function injectBaseHrefForScreenshot(html: string, baseHref: string): string {
+  const esc = baseHref.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+  const tag = `<base href="${esc}">`;
+  const $ = cheerio.load(html);
+  if ($('head').length) {
+    $('head').prepend(tag);
+  } else if ($('body').length) {
+    $('body').prepend(tag);
+  } else {
+    return `<!DOCTYPE html><html><head><meta charset="utf-8">${tag}</head><body>${html}</body></html>`;
+  }
+  return $.html();
+}
+
+/**
+ * Tier-1 fetch has no live navigation — render the saved HTML in headless Chromium
+ * so the dashboard still gets a JPEG (SPA/JS will not run; static DOM only).
+ */
+async function captureScreenshotFromTier1Html(
+  html: string,
+  pageUrl: string,
+  screenshotFilePath: string
+): Promise<string | null> {
+  const browser = await chromium.launch({
+    headless: true,
+    executablePath: process.env.CHROMIUM_PATH,
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+      '--disable-accelerated-2d-canvas',
+      '--disable-gpu',
+      '--hide-scrollbars',
+    ],
+    proxy: config.proxyUrl ? { server: config.proxyUrl } : undefined,
+  });
+  try {
+    const context = await browser.newContext({
+      viewport: { width: 1920, height: 1080 },
+      userAgent: CHROME_UA,
+    });
+    const page = await context.newPage();
+    await page.route('**/*.{png,jpg,jpeg,gif,svg,mp4,webm,avif,woff,woff2}', (route: Route) => route.abort());
+    const htmlWithBase = injectBaseHrefForScreenshot(html, pageUrl);
+    await page.setContent(htmlWithBase, {
+      waitUntil: 'domcontentloaded',
+      timeout: 25000,
+    });
+    await new Promise<void>(resolve => {
+      setTimeout(resolve, 800);
+    });
+    await page.screenshot({ path: screenshotFilePath, type: 'jpeg', quality: 50, fullPage: true });
+    return screenshotFilePath;
+  } catch (err) {
+    logger.warn({ err, pageUrl }, 'Tier-1 HTML screenshot failed');
+    return null;
+  } finally {
+    await browser.close().catch(() => {});
+  }
 }
 
 async function scrapeWithBrowser(
@@ -288,6 +350,10 @@ export async function scrapeUrl(
       await fs.writeFile(textPath, result.extractedText, 'utf-8');
       result.htmlPath = htmlPath;
       result.textPath = textPath;
+
+      const screenshotFilePath = path.join(snapshotsDir, `${prefix}.jpeg`);
+      result.screenshotPath = await captureScreenshotFromTier1Html(html, url, screenshotFilePath);
+
       return result;
     }
 

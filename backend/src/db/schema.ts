@@ -37,6 +37,7 @@ export const users = pgTable('users', {
     emailNotifications: boolean;
   }>().default({ emailNotifications: true }),
   apiToken: text('api_token'),
+  suspended: boolean('suspended').notNull().default(false),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 });
@@ -181,6 +182,22 @@ export const alerts = pgTable('alerts', {
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
+// --- Admin Sessions ---
+
+export const adminSessions = pgTable('admin_sessions', {
+  id: text('id').primaryKey(), // crypto.randomBytes(32).toString('hex')
+  expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
+// --- Admin Config (key-value feature flags + plan overrides) ---
+
+export const adminConfig = pgTable('admin_config', {
+  key: varchar('key', { length: 100 }).primaryKey(),
+  value: text('value').notNull(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
 // --- Relations ---
 
 export const usersRelations = relations(users, ({ many }) => ({
@@ -236,3 +253,5 @@ export type Alert = typeof alerts.$inferSelect;
 export type MonitorGroup = typeof monitorGroups.$inferSelect;
 export type NewMonitorGroup = typeof monitorGroups.$inferInsert;
 export type MonitorStatus = 'active' | 'paused' | 'unreachable';
+export type AdminSession = typeof adminSessions.$inferSelect;
+export type AdminConfig = typeof adminConfig.$inferSelect;

@@ -65,7 +65,16 @@ export default function RegisterPage() {
       setUser(response.data.user);
       router.push('/monitors/new');
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to register');
+      if (!err.response) {
+        setError(
+          'Cannot reach the API. Start the backend on port 3001, or set BACKEND_URL if the API runs elsewhere.'
+        );
+        return;
+      }
+      const data = err.response?.data;
+      const base = data?.error || err.message || 'Failed to register';
+      const detail = data?.detail;
+      setError(detail ? `${base} — ${detail}` : base);
     }
   };
 

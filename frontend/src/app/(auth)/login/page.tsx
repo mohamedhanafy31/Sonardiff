@@ -36,7 +36,16 @@ export default function LoginPage() {
       setUser(response.data.user);
       router.push('/dashboard');
     } catch (err: any) {
-      setError(err.response?.data?.error || 'Failed to login');
+      if (!err.response) {
+        setError(
+          'Cannot reach the API. Start the backend (cd artifacts/mvp/backend && pnpm run dev) on port 3001, or set BACKEND_URL if the API runs elsewhere.'
+        );
+        return;
+      }
+      const data = err.response?.data;
+      const base = data?.error || err.message || 'Failed to login';
+      const detail = data?.detail;
+      setError(detail ? `${base} — ${detail}` : base);
     }
   };
 

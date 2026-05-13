@@ -35,6 +35,11 @@ export async function requireAuth(
     return;
   }
 
+  if (result.user.suspended) {
+    res.status(403).json({ error: 'Account suspended. Contact support.' });
+    return;
+  }
+
   req.user = result.user;
   req.sessionId = result.sessionId;
   next();
