@@ -1,0 +1,1443 @@
+[
+  {
+    "id": "TC001",
+    "title": "Create a monitor and see it in the dashboard",
+    "description": "This test verifies that a logged-in user can create a monitor and immediately see it reflected in their monitor list and dashboard stats.",
+    "category": "Monitor Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to the monitor creation screen"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the monitor name field with a unique monitor name"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the website URL field with a valid URL"
+      },
+      {
+        "type": "action",
+        "description": "Select a valid check interval"
+      },
+      {
+        "type": "action",
+        "description": "Fill in a valid threshold value"
+      },
+      {
+        "type": "action",
+        "description": "Save the monitor"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the new monitor appears in the user's monitor list"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify dashboard stats are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC002",
+    "title": "Register a new account and open the authenticated session",
+    "description": "This test verifies that a visitor can register a new account and reach the authenticated state with a usable session.",
+    "category": "Authentication",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Open the registration form"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with a unique email address"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with a valid password"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the name field with a display name"
+      },
+      {
+        "type": "action",
+        "description": "Submit the registration form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the authenticated user profile is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify session-specific account information is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC003",
+    "title": "Log in and log out of an existing account",
+    "description": "This test verifies that a registered user can sign in successfully and then end the session by logging out.",
+    "category": "Authentication",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open the account menu"
+      },
+      {
+        "type": "action",
+        "description": "Log out of the account"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the user is returned to an unauthenticated state"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify protected account content is no longer displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC004",
+    "title": "Prevent editing a monitor you do not own",
+    "description": "This verifies that a signed-in user cannot access or modify another user's monitor and sees an ownership error state.",
+    "category": "Monitor Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credentials with {{LOGIN_USER}} and {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open a monitor that belongs to another account"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an ownership error is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the monitor details are not shown"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC005",
+    "title": "Manual check increases monthly quota for a Pro monitor",
+    "description": "A Pro user can run a manual check on an existing monitor and see their current month quota usage increase afterward.",
+    "category": "Quota Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open an existing Pro monitor"
+      },
+      {
+        "type": "action",
+        "description": "Trigger a manual check for the monitor"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the monitor check completes successfully"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the current month quota usage has increased"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC006",
+    "title": "Trigger a manual check and review the new diff",
+    "description": "This test verifies that a Pro user can trigger a manual check on an existing monitor and then open the resulting diff history and diff detail view.",
+    "category": "Monitor Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to an existing monitor's details page"
+      },
+      {
+        "type": "action",
+        "description": "Trigger a manual check for the monitor"
+      },
+      {
+        "type": "action",
+        "description": "Open the monitor's diff history"
+      },
+      {
+        "type": "action",
+        "description": "Open the most recent diff detail"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a new diff entry is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify diff details and monitor metadata are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC007",
+    "title": "Monitor creation is blocked when projected quota would be exceeded",
+    "description": "A user cannot create a new monitor when the projected checks would exceed their plan quota, and the monitor is not created.",
+    "category": "Quota Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Start creating a new monitor with a valid target URL"
+      },
+      {
+        "type": "action",
+        "description": "Set the interval and threshold for the monitor"
+      },
+      {
+        "type": "action",
+        "description": "Save the monitor"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a quota limit error is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the monitor was not created"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC008",
+    "title": "See monitor status reflected on the dashboard",
+    "description": "This verifies that a signed-in user can create a monitor and then see it reflected in the dashboard overview.",
+    "category": "Tiered Scraper Worker",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credentials with {{LOGIN_USER}} and {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Create a new monitor for a valid page URL"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the monitor to be processed"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to the dashboard"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify dashboard stats are displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the new monitor appears in the monitor summary"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC009",
+    "title": "Manual check is blocked when monthly quota is exhausted",
+    "description": "A user with no remaining monthly checks cannot trigger a manual check, and the monitor stays unchanged.",
+    "category": "Quota Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open an existing monitor with no remaining quota"
+      },
+      {
+        "type": "action",
+        "description": "Trigger a manual check for the monitor"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a quota limit error is visible"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify no new check result is created"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC010",
+    "title": "Delete a monitor and remove its related history",
+    "description": "This test verifies that deleting an owned monitor removes it from the UI and no longer shows its related history.",
+    "category": "Monitor Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to an existing monitor's details page"
+      },
+      {
+        "type": "action",
+        "description": "Delete the monitor"
+      },
+      {
+        "type": "action",
+        "description": "Confirm the deletion action"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the monitor is removed from the user interface"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify related monitor history is no longer displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC011",
+    "title": "Trigger a manual check for a Pro monitor",
+    "description": "This verifies that a Pro user can manually check an existing monitor and see the monitor status update afterward.",
+    "category": "Tiered Scraper Worker",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credentials with {{LOGIN_USER}} and {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open an existing Pro monitor"
+      },
+      {
+        "type": "action",
+        "description": "Trigger a manual check for the monitor"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the check to complete"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the monitor shows a recent check result"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the monitor's last checked time is updated"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC012",
+    "title": "Preview a selector before saving a Pro monitor",
+    "description": "This test verifies that a Pro user can preview a CSS selector in the DOM picker and then save a monitor using that selector.",
+    "category": "Monitor Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to the monitor creation screen"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the monitor name field with a unique Pro monitor name"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the website URL field with a valid URL"
+      },
+      {
+        "type": "action",
+        "description": "Select a valid check interval"
+      },
+      {
+        "type": "action",
+        "description": "Open the selector picker preview"
+      },
+      {
+        "type": "action",
+        "description": "Choose a CSS selector to preview"
+      },
+      {
+        "type": "action",
+        "description": "Save the monitor"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the selector preview is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the monitor is created successfully"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC013",
+    "title": "Use DOM Picker to find content before saving a Pro monitor",
+    "description": "This verifies that a Pro user can preview a selector, save a Pro monitor with selector-based extraction, and see it reflected in the monitor list.",
+    "category": "DOM Picker",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credentials with {{LOGIN_USER}} and {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to the DOM picker preview page"
+      },
+      {
+        "type": "action",
+        "description": "Fill in a valid page URL in the URL field"
+      },
+      {
+        "type": "action",
+        "description": "Fill in a valid CSS selector in the selector field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the preview request"
+      },
+      {
+        "type": "action",
+        "description": "Save the preview as a new Pro monitor with selector-based extraction"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the Pro monitor is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify dashboard stats include the new monitor"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC014",
+    "title": "Review the latest diff for a monitor",
+    "description": "This verifies that a signed-in user can open a monitor's diff history and inspect the most recent change detail.",
+    "category": "Tiered Scraper Worker",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credentials with {{LOGIN_USER}} and {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open a monitor that has a recorded change"
+      },
+      {
+        "type": "action",
+        "description": "Open the diff history for the monitor"
+      },
+      {
+        "type": "action",
+        "description": "Open the most recent diff detail"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify diff history entries are displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify diff detail content is displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC015",
+    "title": "View monitor diffs and a diff detail page",
+    "description": "This test verifies that a user can open a monitor's diff history and inspect the full detail for a specific diff.",
+    "category": "Monitor Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to an existing monitor's diffs page"
+      },
+      {
+        "type": "action",
+        "description": "Open a specific diff entry"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify diff history is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify full diff details are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC016",
+    "title": "Preview a selector on a page",
+    "description": "This verifies that a signed-in user can preview how a CSS selector resolves on a target page and see extracted content returned.",
+    "category": "DOM Picker",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credentials with {{LOGIN_USER}} and {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to the DOM picker preview page"
+      },
+      {
+        "type": "action",
+        "description": "Fill in a valid page URL in the URL field"
+      },
+      {
+        "type": "action",
+        "description": "Fill in a valid CSS selector in the selector field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the preview request"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify extracted content is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the response includes the page status"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC017",
+    "title": "Update monitor settings and keep ownership enforced",
+    "description": "This test verifies that an authenticated user can update an owned monitor and that the updated settings are reflected in the UI.",
+    "category": "Monitor Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to an existing monitor's details page"
+      },
+      {
+        "type": "action",
+        "description": "Open the edit monitor form"
+      },
+      {
+        "type": "action",
+        "description": "Change the monitor name"
+      },
+      {
+        "type": "action",
+        "description": "Change the monitor interval"
+      },
+      {
+        "type": "action",
+        "description": "Change the active state"
+      },
+      {
+        "type": "action",
+        "description": "Save the monitor changes"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the updated monitor settings are displayed"
+      }
+    ],
+    "priority": "High"
+  },
+  {
+    "id": "TC018",
+    "title": "Create a monitor from a selector preview",
+    "description": "This verifies that a signed-in user can preview content and then save a monitor based on the same target page.",
+    "category": "DOM Picker",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credentials with {{LOGIN_USER}} and {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to the DOM picker preview page"
+      },
+      {
+        "type": "action",
+        "description": "Fill in a valid page URL in the URL field"
+      },
+      {
+        "type": "action",
+        "description": "Fill in a valid CSS selector in the selector field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the preview request"
+      },
+      {
+        "type": "action",
+        "description": "Save the preview as a new monitor"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the new monitor is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify dashboard stats include the new monitor"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC019",
+    "title": "View the current account profile and preferences",
+    "description": "This test verifies that a logged-in user can open their account profile and see current user information and preferences.",
+    "category": "Authentication",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open the account profile page"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the current user profile is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify account preferences are displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC020",
+    "title": "Delete a monitor and remove it from the account",
+    "description": "This verifies that an account owner can delete a monitor and no longer see it in their monitor list.",
+    "category": "Monitor Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credentials with {{LOGIN_USER}} and {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open one of the user's monitors"
+      },
+      {
+        "type": "action",
+        "description": "Delete the monitor"
+      },
+      {
+        "type": "action",
+        "description": "Confirm the deletion"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the monitor is removed from the list"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an empty or reduced monitor list is displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC021",
+    "title": "Update a monitor's settings",
+    "description": "This verifies that an account owner can edit a monitor's threshold, interval, or active state and see the updated settings saved.",
+    "category": "Monitor Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credentials with {{LOGIN_USER}} and {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open one of the user's monitors"
+      },
+      {
+        "type": "action",
+        "description": "Open the monitor settings"
+      },
+      {
+        "type": "action",
+        "description": "Change the monitor threshold, interval, or active state"
+      },
+      {
+        "type": "action",
+        "description": "Save the monitor changes"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the updated monitor settings are displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the monitor remains in the user's monitor list"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC022",
+    "title": "Update the account profile successfully",
+    "description": "This test verifies that a logged-in user can change profile details and see the updated account information afterward.",
+    "category": "Authentication",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open the profile settings page"
+      },
+      {
+        "type": "action",
+        "description": "Change the display name"
+      },
+      {
+        "type": "action",
+        "description": "Save the profile changes"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the updated profile information is displayed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC023",
+    "title": "Block sign in with invalid credentials",
+    "description": "This test verifies that entering incorrect login credentials keeps the visitor signed out and shows an authentication error.",
+    "category": "Authentication",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with a valid email address"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with an invalid password"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify an invalid credentials message is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the user remains signed out"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC024",
+    "title": "Generate a new API token",
+    "description": "This test verifies that a logged-in user can generate an API token and see it displayed in their account settings.",
+    "category": "Authentication",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open the API token settings page"
+      },
+      {
+        "type": "action",
+        "description": "Generate a new API token"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a new API token is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the token can be viewed in account settings"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC025",
+    "title": "Monthly quota bucket refreshes for active users",
+    "description": "An active user can continue checking monitors after the monthly quota bucket rolls over, and the new month usage is applied.",
+    "category": "Quota Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open the quota or usage view"
+      },
+      {
+        "type": "action",
+        "description": "Wait for the next month usage bucket to be shown"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a current month quota bucket is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify checks can be used from the refreshed bucket"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC026",
+    "title": "Show validation on duplicate registration email",
+    "description": "This test verifies that attempting to register with an email already in use shows a duplicate-account validation message.",
+    "category": "Authentication",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Open the registration form"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with a valid password"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the name field with a display name"
+      },
+      {
+        "type": "action",
+        "description": "Submit the registration form"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a duplicate email validation message is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the registration is not completed"
+      }
+    ],
+    "priority": "Medium"
+  },
+  {
+    "id": "TC027",
+    "title": "Show validation when creating a monitor with a bad threshold",
+    "description": "This verifies that a signed-in user sees validation feedback when monitor threshold input is outside the allowed range.",
+    "category": "Monitor Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credentials with {{LOGIN_USER}} and {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Start creating a new monitor"
+      },
+      {
+        "type": "action",
+        "description": "Fill in a valid page URL in the URL field"
+      },
+      {
+        "type": "action",
+        "description": "Fill in an out-of-range threshold value"
+      },
+      {
+        "type": "action",
+        "description": "Save the monitor"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a threshold validation error is displayed"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC028",
+    "title": "Create a monitor with invalid input",
+    "description": "This test verifies that invalid monitor data is rejected and validation feedback is shown without creating a monitor.",
+    "category": "Monitor Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to the monitor creation screen"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the monitor name field with a unique monitor name"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the website URL field with an invalid URL"
+      },
+      {
+        "type": "action",
+        "description": "Fill in an out-of-range threshold value"
+      },
+      {
+        "type": "action",
+        "description": "Save the monitor"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify validation errors are displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the monitor is not created"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC029",
+    "title": "Block monitor creation without a valid URL",
+    "description": "This verifies that a signed-in user cannot create a monitor until a valid target URL is provided.",
+    "category": "Monitor Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credentials with {{LOGIN_USER}} and {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Start creating a new monitor"
+      },
+      {
+        "type": "action",
+        "description": "Leave the URL field empty"
+      },
+      {
+        "type": "action",
+        "description": "Save the monitor"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a URL validation error is displayed"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC030",
+    "title": "Reject an invalid preview URL",
+    "description": "This verifies that a signed-in user sees a validation error when the DOM picker is used with a malformed URL.",
+    "category": "DOM Picker",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credentials with {{LOGIN_USER}} and {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to the DOM picker preview page"
+      },
+      {
+        "type": "action",
+        "description": "Fill in a malformed URL in the URL field"
+      },
+      {
+        "type": "action",
+        "description": "Fill in a valid CSS selector in the selector field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the preview request"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a validation error is displayed"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC031",
+    "title": "Reject Pro-only monitor settings on a Free account",
+    "description": "This test verifies that a Free user cannot save Pro-only selector or exclusion settings when creating a monitor.",
+    "category": "Monitor Management",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the email field with {{LOGIN_USER}}"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the password field with {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to the monitor creation screen"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the monitor name field with a unique monitor name"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the website URL field with a valid URL"
+      },
+      {
+        "type": "action",
+        "description": "Select a valid check interval"
+      },
+      {
+        "type": "action",
+        "description": "Add a CSS selector rule"
+      },
+      {
+        "type": "action",
+        "description": "Add an exclusion rule"
+      },
+      {
+        "type": "action",
+        "description": "Save the monitor"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a plan restriction message is displayed"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the monitor is not created"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC032",
+    "title": "Handle an empty selector result",
+    "description": "This verifies that a signed-in user can preview a valid page with a selector that matches nothing and see an empty result state.",
+    "category": "DOM Picker",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credentials with {{LOGIN_USER}} and {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Navigate to the DOM picker preview page"
+      },
+      {
+        "type": "action",
+        "description": "Fill in a valid page URL in the URL field"
+      },
+      {
+        "type": "action",
+        "description": "Fill in a selector that does not match content in the selector field"
+      },
+      {
+        "type": "action",
+        "description": "Submit the preview request"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify the preview returns empty or partial extracted content"
+      }
+    ],
+    "priority": "Low"
+  },
+  {
+    "id": "TC033",
+    "title": "Handle a non-existent diff record gracefully",
+    "description": "This verifies that a signed-in user sees a not-found style state when opening a diff detail that is unavailable in the UI.",
+    "category": "Tiered Scraper Worker",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to /login"
+      },
+      {
+        "type": "action",
+        "description": "Fill in the login credentials with {{LOGIN_USER}} and {{LOGIN_PASSWORD}}"
+      },
+      {
+        "type": "action",
+        "description": "Submit the login form"
+      },
+      {
+        "type": "action",
+        "description": "Open the diff history for a monitor"
+      },
+      {
+        "type": "action",
+        "description": "Open a diff that is no longer available in the UI"
+      },
+      {
+        "type": "assertion",
+        "description": "Verify a not-found state is displayed"
+      }
+    ],
+    "priority": "Low"
+  }
+]

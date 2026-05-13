@@ -1,0 +1,52 @@
+[
+  {
+    "id": "TC001",
+    "title": "postapimonitorsvalidateandcreatemonitor",
+    "description": "Test creating a new monitor with valid data including plan-compliant URL, interval, threshold, and optional Pro-only fields. Verify response 201 with created monitor object."
+  },
+  {
+    "id": "TC002",
+    "title": "postapimonitorsvalidateandrejectinvaliddata",
+    "description": "Test creating a new monitor with invalid data such as malformed URL or out-of-range threshold. Verify response 400 with appropriate error message."
+  },
+  {
+    "id": "TC003",
+    "title": "postapimonitorsrejectprofieldsforfreeplan",
+    "description": "Test creating a new monitor on a Free plan with Pro-only fields like cssSelector or exclusionRules. Verify response 403 with error message."
+  },
+  {
+    "id": "TC004",
+    "title": "patchapimonitorsidupdatefieldswithvalidation",
+    "description": "Test updating an existing monitor's fields including name, URL, interval, active state, threshold, and Pro-only fields. Validate plan and threshold range. Verify response 200 with updated monitor or appropriate error codes."
+  },
+  {
+    "id": "TC005",
+    "title": "patchapimonitorsidnotfound",
+    "description": "Test updating a monitor that does not exist or is not owned by the user. Verify response 404 with 'Monitor not found' error."
+  },
+  {
+    "id": "TC006",
+    "title": "deleteapimonitorsiddeletesmonitorandrelateddata",
+    "description": "Test deleting an existing owned monitor. Verify response 200 with success true and cascading removal of snapshots, diffs, and alerts."
+  },
+  {
+    "id": "TC007",
+    "title": "postapimonitorsidcheckmanualcheckproonly",
+    "description": "Test triggering an immediate manual check on a Pro plan monitor. Verify response 200 with success true and updated manualChecksUsedThisPeriod."
+  },
+  {
+    "id": "TC008",
+    "title": "postapimonitorsidcheckmanualcheckforfreeplan",
+    "description": "Test triggering an immediate manual check on a Free plan monitor. Verify response 403 with error message."
+  },
+  {
+    "id": "TC009",
+    "title": "getapimonitorsiddiffslistdiffshistory",
+    "description": "Test retrieving the diff history for a specific monitor. Verify response 200 with list of diffs or 404 if monitor not found."
+  },
+  {
+    "id": "TC010",
+    "title": "getapimonitorsiddiffsdiffidgetfulldiffdetail",
+    "description": "Test retrieving full diff detail including snapshot metadata and diff data for a specific diff of a monitor. Verify response 200 with diff and monitor objects or 404 if diff not found."
+  }
+]

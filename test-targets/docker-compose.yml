@@ -1,0 +1,42 @@
+services:
+  app1-static:
+    build: ./app1-static
+    ports:
+      - "3010:3000"
+    restart: unless-stopped
+
+  app2-spa:
+    build: ./app2-spa
+    ports:
+      - "3011:3000"
+    restart: unless-stopped
+
+  app3-noise:
+    build: ./app3-noise
+    ports:
+      - "3012:3000"
+    restart: unless-stopped
+
+  app4-ecommerce:
+    build: ./app4-ecommerce
+    ports:
+      - "3013:3000"
+    restart: unless-stopped
+
+  app5-saas:
+    build: ./app5-saas
+    ports:
+      - "3014:3000"
+    restart: unless-stopped
+
+  app6-availability:
+    build: ./app6-availability
+    ports:
+      - "3015:3000"
+    restart: unless-stopped
+
+  app7-errors:
+    build: ./app7-errors
+    ports:
+      - "3016:3000"
+    restart: unless-stopped

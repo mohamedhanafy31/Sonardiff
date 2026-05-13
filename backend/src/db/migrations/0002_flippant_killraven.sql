@@ -1,0 +1,1 @@
+ALTER TABLE "users" ADD COLUMN "manual_checks_used_this_period" integer DEFAULT 0 NOT NULL;

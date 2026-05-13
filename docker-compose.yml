@@ -1,0 +1,95 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: sonardiff_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: sonardiff
+      POSTGRES_USER: sonardiff
+      POSTGRES_PASSWORD: sonardiff_dev
+    volumes:
+      - sonardiff_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sonardiff -d sonardiff"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: sonardiff_redis
+    restart: unless-stopped
+    volumes:
+      - sonardiff_redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: sonardiff_backend
+    restart: unless-stopped
+    env_file: ./backend/.env
+    environment:
+      DATABASE_URL: postgresql://sonardiff:sonardiff_dev@db:5432/sonardiff
+      REDIS_URL: redis://redis:6379
+    ports:
+      - "3001:3001"
+    volumes:
+      - sonardiff_data:/app/data
+      - sonardiff_logs:/app/logs
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3001/api/healthz || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: sonardiff_worker
+    restart: unless-stopped
+    command: node dist/worker.js
+    env_file: ./backend/.env
+    environment:
+      DATABASE_URL: postgresql://sonardiff:sonardiff_dev@db:5432/sonardiff
+      REDIS_URL: redis://redis:6379
+    volumes:
+      - sonardiff_data:/app/data
+      - sonardiff_logs:/app/logs
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      # NEXT_PUBLIC_API_URL must be the public-facing URL, not internal Docker hostname.
+      # For local dev: pass via --build-arg or set in frontend/.env.local before build.
+      # For production: pass the real domain via CI/CD --build-arg.
+    container_name: sonardiff_frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+volumes:
+  sonardiff_pgdata:
+  sonardiff_redisdata:
+  sonardiff_data:     # shared between backend + worker
+  sonardiff_logs:     # shared between backend + worker

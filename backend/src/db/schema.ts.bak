@@ -1,0 +1,189 @@
+import {
+  pgTable,
+  uuid,
+  text,
+  varchar,
+  integer,
+  boolean,
+  real,
+  timestamp,
+  pgEnum,
+  jsonb,
+} from 'drizzle-orm/pg-core';
+import { relations } from 'drizzle-orm';
+
+// --- Enums ---
+
+export const planEnum = pgEnum('plan', ['free', 'pro']);
+export const alertChannelEnum = pgEnum('alert_channel', ['email']);
+export const alertStatusEnum = pgEnum('alert_status', ['pending', 'sent', 'failed']);
+
+// --- Users ---
+
+export const users = pgTable('users', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  email: varchar('email', { length: 255 }).notNull().unique(),
+  passwordHash: text('password_hash').notNull(),
+  name: varchar('name', { length: 255 }).notNull(),
+  plan: planEnum('plan').notNull().default('free'),
+  planLimit: integer('plan_limit').notNull().default(150), // Free: 150, Pro: 36000
+  checksUsedThisPeriod: integer('checks_used_this_period').notNull().default(0),
+  manualChecksUsedThisPeriod: integer('manual_checks_used_this_period').notNull().default(0),
+  periodResetAt: timestamp('period_reset_at', { withTimezone: true }).notNull(),
+  preferences: jsonb('preferences').$type<{
+    emailNotifications: boolean;
+  }>().default({ emailNotifications: true }),
+  apiToken: text('api_token'),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
+// --- Sessions ---
+
+export const sessions = pgTable('sessions', {
+  id: text('id').primaryKey(), // crypto.randomBytes token
+  userId: uuid('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
+// --- Monitors ---
+
+export const monitors = pgTable('monitors', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: uuid('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  name: varchar('name', { length: 255 }).notNull(),
+  url: text('url').notNull(),
+  checkIntervalMinutes: integer('check_interval_minutes').notNull().default(1440), // daily
+  isActive: boolean('is_active').notNull().default(true),
+
+  // Phase 2: Element targeting
+  cssSelector: text('css_selector'), // nullable — only for Pro users
+  exclusionRules: jsonb('exclusion_rules'), // nullable — [{type: 'keyword'|'regex', value: string}]
+  threshold: real('threshold').default(0.1), // minimum % change to trigger alert
+
+  lastCheckedAt: timestamp('last_checked_at', { withTimezone: true }),
+  nextCheckAt: timestamp('next_check_at', { withTimezone: true }),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
+// --- Snapshots ---
+
+export const snapshots = pgTable('snapshots', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  monitorId: uuid('monitor_id')
+    .notNull()
+    .references(() => monitors.id, { onDelete: 'cascade' }),
+
+  // File paths (stored on filesystem, not in DB)
+  htmlPath: text('html_path').notNull(),
+  textPath: text('text_path').notNull(),
+  screenshotPath: text('screenshot_path'), // nullable — may fail
+
+  httpStatus: integer('http_status'),
+  error: text('error'), // null = success
+
+  // SHA-256 hex of post-exclusion text — for identical-run detection
+  contentHash: text('content_hash'),
+
+  capturedAt: timestamp('captured_at', { withTimezone: true }).notNull().defaultNow(),
+  expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+});
+
+// --- Diffs ---
+
+export const diffs = pgTable('diffs', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  monitorId: uuid('monitor_id')
+    .notNull()
+    .references(() => monitors.id, { onDelete: 'cascade' }),
+  snapshotOldId: uuid('snapshot_old_id')
+    .notNull()
+    .references(() => snapshots.id, { onDelete: 'cascade' }),
+  snapshotNewId: uuid('snapshot_new_id')
+    .notNull()
+    .references(() => snapshots.id, { onDelete: 'cascade' }),
+
+  // File path to diff JSON on disk
+  diffPath: text('diff_path').notNull(),
+
+  // Short summary is small enough for DB
+  changeSummary: text('change_summary').notNull(),
+  changePercentage: real('change_percentage').notNull(),
+
+  detectedAt: timestamp('detected_at', { withTimezone: true }).notNull().defaultNow(),
+  expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
+});
+
+// --- Alerts ---
+
+export const alerts = pgTable('alerts', {
+  id: uuid('id').defaultRandom().primaryKey(),
+  userId: uuid('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  monitorId: uuid('monitor_id')
+    .notNull()
+    .references(() => monitors.id, { onDelete: 'cascade' }),
+  diffId: uuid('diff_id')
+    .notNull()
+    .references(() => diffs.id, { onDelete: 'cascade' }),
+
+  channel: alertChannelEnum('channel').notNull().default('email'),
+  status: alertStatusEnum('status').notNull().default('pending'),
+
+  sentAt: timestamp('sent_at', { withTimezone: true }),
+  error: text('error'),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
+// --- Relations ---
+
+export const usersRelations = relations(users, ({ many }) => ({
+  sessions: many(sessions),
+  monitors: many(monitors),
+  alerts: many(alerts),
+}));
+
+export const sessionsRelations = relations(sessions, ({ one }) => ({
+  user: one(users, { fields: [sessions.userId], references: [users.id] }),
+}));
+
+export const monitorsRelations = relations(monitors, ({ one, many }) => ({
+  user: one(users, { fields: [monitors.userId], references: [users.id] }),
+  snapshots: many(snapshots),
+  diffs: many(diffs),
+  alerts: many(alerts),
+}));
+
+export const snapshotsRelations = relations(snapshots, ({ one }) => ({
+  monitor: one(monitors, { fields: [snapshots.monitorId], references: [monitors.id] }),
+}));
+
+export const diffsRelations = relations(diffs, ({ one }) => ({
+  monitor: one(monitors, { fields: [diffs.monitorId], references: [monitors.id] }),
+  snapshotOld: one(snapshots, { fields: [diffs.snapshotOldId], references: [snapshots.id] }),
+  snapshotNew: one(snapshots, { fields: [diffs.snapshotNewId], references: [snapshots.id] }),
+}));
+
+export const alertsRelations = relations(alerts, ({ one }) => ({
+  user: one(users, { fields: [alerts.userId], references: [users.id] }),
+  monitor: one(monitors, { fields: [alerts.monitorId], references: [monitors.id] }),
+  diff: one(diffs, { fields: [alerts.diffId], references: [diffs.id] }),
+}));
+
+// --- Type Exports ---
+
+export type User = typeof users.$inferSelect;
+export type NewUser = typeof users.$inferInsert;
+export type Session = typeof sessions.$inferSelect;
+export type Monitor = typeof monitors.$inferSelect;
+export type NewMonitor = typeof monitors.$inferInsert;
+export type Snapshot = typeof snapshots.$inferSelect;
+export type Diff = typeof diffs.$inferSelect;
+export type Alert = typeof alerts.$inferSelect;
