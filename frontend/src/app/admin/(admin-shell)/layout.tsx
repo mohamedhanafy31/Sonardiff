@@ -5,6 +5,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { Loader2, RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Logo } from '@/components/Logo';
 
 const navItems = [
   {
@@ -90,8 +91,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* Sidebar */}
       <aside className="w-[220px] shrink-0 bg-bg-card border-r border-line flex flex-col sticky top-0 h-screen">
         {/* Brand */}
-        <div className="px-4 py-5 border-b border-line/60">
-          <div className="flex items-center gap-2">
+        <div className="px-6 pt-7 pb-4 shrink-0">
+          <Logo className="h-6" />
+        </div>
+
+        <div className="px-4 py-4 border-b border-line/60 mx-2 mb-2">
+          <div className="flex items-center gap-2 px-2">
             <div className="w-7 h-7 rounded-md bg-red/20 border border-red/30 flex items-center justify-center">
               <svg viewBox="0 0 16 16" fill="none" className="w-3.5 h-3.5 text-red" stroke="currentColor" strokeWidth="1.5">
                 <path d="M8 2a6 6 0 1 0 0 12A6 6 0 0 0 8 2z" />

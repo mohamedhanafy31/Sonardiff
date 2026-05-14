@@ -192,9 +192,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         "fixed inset-y-0 left-0 z-50 w-[260px] bg-bg-card border-r border-line flex flex-col transition-transform duration-300 md:sticky md:top-0 md:h-screen md:translate-x-0 shrink-0",
         isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
       )}>
+        {/* Brand Logo */}
+        <div className="px-6 pt-7 pb-4 shrink-0">
+          <Logo className="h-7" />
+        </div>
+
         {/* Workspace header */}
-        <div className="flex items-center justify-between px-4 py-5 gap-2 shrink-0">
-          <div className="flex items-center gap-2.5 min-w-0">
+        <div className="flex items-center justify-between px-4 py-4 gap-2 shrink-0 border-b border-line/50 mx-2 mb-2">
+          <div className="flex items-center gap-2.5 min-w-0 px-2">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent to-cyan-300 text-[#042F36] font-bold text-[14px] flex items-center justify-center shrink-0">
               {userInitials[0] || 'N'}
             </div>
