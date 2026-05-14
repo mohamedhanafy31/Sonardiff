@@ -49,11 +49,9 @@ export default function MonitorsPage() {
   const itemsPerPage = 10;
   const { user } = useAuthStore();
 
-  // Show success toast when redirected from wizard with ?created=1
   useEffect(() => {
     if (searchParams?.get('created') === '1') {
       showToast('success', 'Monitor created successfully!');
-      // Clean the query param from the URL without reloading
       window.history.replaceState({}, '', '/monitors');
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -83,11 +81,9 @@ export default function MonitorsPage() {
     if (user) fetchMonitors();
   }, [user]);
 
-  // ── Group actions ──
   const togglePauseGroup = async (groupId: string, isActive: boolean) => {
     try {
       const { data } = await api.post(`/monitor-groups/${groupId}/pause`, { isActive });
-      // Optimistic UI
       setMonitors(monitors.map(m => m.groupId === groupId ? { ...m, isActive } : m));
       setGroups(groups.map(g => g.id === groupId ? { ...g, activeCount: isActive ? g.memberCount : 0 } : g));
       showToast('success', `${data.updated} monitor${data.updated !== 1 ? 's' : ''} ${isActive ? 'resumed' : 'paused'}.`);
@@ -189,24 +185,21 @@ export default function MonitorsPage() {
 
   return (
     <div>
-      {/* Delete confirmation dialog */}
+      {/* Delete monitor confirmation */}
       {deleteConfirmId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-          <div className="bg-bg-card border border-line rounded-[16px] p-6 max-w-sm w-full mx-4 shadow-xl">
-            <h3 className="font-semibold text-[16px] mb-2">Delete monitor?</h3>
-            <p className="text-ink-3 text-[13.5px] mb-5">All diff history will be permanently removed. This cannot be undone.</p>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+          <div className="bg-bg-card border border-white/[0.08] rounded-[16px] p-6 max-w-sm w-full mx-4 shadow-xl">
+            <h3 className="font-semibold text-[15px] mb-2 text-foreground">Delete monitor?</h3>
+            <p className="text-ink-4 text-[13px] mb-5 leading-relaxed">All diff history will be permanently removed. This cannot be undone.</p>
             <div className="flex gap-2">
               <button
                 onClick={() => deleteMonitor(deleteConfirmId)}
                 disabled={isDeleting}
-                className="flex-1 h-10 bg-red hover:bg-red/90 text-white text-[13.5px] font-semibold rounded-[10px] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="flex-1 h-9 bg-red hover:bg-red/90 text-white text-[13px] font-semibold rounded-[8px] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
-                {isDeleting ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Delete monitor'}
+                {isDeleting ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Delete'}
               </button>
-              <button
-                onClick={() => setDeleteConfirmId(null)}
-                className="flex-1 btn ghost"
-              >
+              <button onClick={() => setDeleteConfirmId(null)} className="flex-1 btn ghost">
                 Cancel
               </button>
             </div>
@@ -214,85 +207,83 @@ export default function MonitorsPage() {
         </div>
       )}
 
-      {/* Toast notification — fixed floating */}
+      {/* Toast */}
       {toast && (
         <div className="fixed bottom-6 right-6 z-[60] max-w-sm w-full pointer-events-auto">
-          <div className={`flex items-center gap-3 px-4 py-3.5 rounded-[12px] shadow-xl text-sm border backdrop-blur-sm ${
+          <div className={cn(
+            "flex items-center gap-3 px-4 py-3 rounded-[10px] shadow-xl text-[13px] border",
             toast.type === 'success'
               ? 'bg-green-bg border-green/25 text-green-ink'
               : 'bg-red-bg border-red/25 text-red-ink'
-          }`}>
+          )}>
             {toast.type === 'success'
               ? <CheckCircle className="w-4 h-4 shrink-0" />
               : <AlertCircle className="w-4 h-4 shrink-0" />}
             <span className="flex-1">{toast.message}</span>
-            <button onClick={() => setToast(null)} className="shrink-0 opacity-60 hover:opacity-100 transition-opacity">
+            <button onClick={() => setToast(null)} className="shrink-0 opacity-60 hover:opacity-100">
               <X className="w-4 h-4" />
             </button>
           </div>
         </div>
       )}
 
-      {/* Delete-group confirmation */}
+      {/* Delete group confirmation */}
       {deleteGroupId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-          <div className="bg-bg-card border border-line rounded-[16px] p-6 max-w-md w-full mx-4 shadow-xl">
-            <h3 className="font-semibold text-[16px] mb-2">Delete group and all its monitors?</h3>
-            <p className="text-ink-3 text-[13.5px] mb-5">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
+          <div className="bg-bg-card border border-white/[0.08] rounded-[16px] p-6 max-w-md w-full mx-4 shadow-xl">
+            <h3 className="font-semibold text-[15px] mb-2 text-foreground">Delete group and all monitors?</h3>
+            <p className="text-ink-4 text-[13px] mb-5 leading-relaxed">
               This will permanently delete{' '}
-              <strong>{groups.find(g => g.id === deleteGroupId)?.memberCount ?? 0} monitors</strong>{' '}
-              and all their diff history. This cannot be undone.
+              <strong className="text-foreground">{groups.find(g => g.id === deleteGroupId)?.memberCount ?? 0} monitors</strong>{' '}
+              and all their diff history.
             </p>
             <div className="flex gap-2">
               <button
                 onClick={() => deleteGroup(deleteGroupId)}
                 disabled={isDeleting}
-                className="flex-1 h-10 bg-red hover:bg-red/90 text-white text-[13.5px] font-semibold rounded-[10px] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="flex-1 h-9 bg-red hover:bg-red/90 text-white text-[13px] font-semibold rounded-[8px] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {isDeleting ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Delete group'}
               </button>
-              <button onClick={() => setDeleteGroupId(null)} className="flex-1 btn ghost">
-                Cancel
-              </button>
+              <button onClick={() => setDeleteGroupId(null)} className="flex-1 btn ghost">Cancel</button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Page head */}
-      <div className="flex justify-between items-end flex-wrap gap-5 mb-7">
+      {/* Page header */}
+      <div className="sd-header flex justify-between items-end flex-wrap gap-5 mb-8">
         <div>
-          <h1 className="font-display text-[28px] font-semibold tracking-tight">Monitors</h1>
-          <div className="text-ink-3 text-[14.5px] mt-1">Manage your tracked websites and configuration.</div>
+          <h1 className="text-[24px] font-semibold tracking-tight text-foreground">Monitors</h1>
+          <p className="text-ink-4 text-[13px] mt-0.5">Track changes across your watched URLs.</p>
         </div>
-        <Link href="/monitors/new" className="btn accent">
-          <Plus className="w-4 h-4" />
-          Add monitor
+        <Link href="/monitors/new" className="btn accent sm">
+          <Plus className="w-3.5 h-3.5" />
+          New monitor
         </Link>
       </div>
 
-      {/* Groups section */}
+      {/* Groups */}
       {!loading && groups.length > 0 && (
-        <div className="mb-6 space-y-2">
-          <h2 className="text-[12px] uppercase tracking-[0.08em] text-ink-4 font-semibold mb-2">
-            Groups ({groups.length})
+        <div className="mb-5 space-y-1.5">
+          <h2 className="text-[10.5px] uppercase tracking-[0.1em] text-ink-5 font-semibold mb-2 px-1">
+            Groups
           </h2>
           {groups.map((group) => {
             const collapsed = collapsedGroups.has(group.id);
             const groupMonitors = monitors.filter(m => m.groupId === group.id);
             const allActive = group.activeCount === group.memberCount && group.memberCount > 0;
             return (
-              <div key={group.id} className="bg-bg-card border border-line rounded-[12px] overflow-hidden">
-                <div className="px-4 py-3 flex flex-wrap items-center gap-3">
+              <div key={group.id} className="bg-bg-card border border-line rounded-[10px] overflow-hidden">
+                <div className="px-4 py-2.5 flex flex-wrap items-center gap-2.5">
                   <button
                     type="button"
                     onClick={() => toggleGroupCollapsed(group.id)}
-                    className="text-ink-4 hover:text-ink-2 transition-colors"
-                    aria-label={collapsed ? 'Expand' : 'Collapse'}
+                    className="text-ink-5 hover:text-ink-3 transition-colors"
                   >
-                    {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                    {collapsed ? <ChevronRight className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
                   </button>
-                  <Folder className="w-4 h-4 text-accent-2" />
+                  <Folder className="w-3.5 h-3.5 text-accent/70" />
                   {renamingGroup?.id === group.id ? (
                     <input
                       autoFocus
@@ -304,61 +295,54 @@ export default function MonitorsPage() {
                         if (e.key === 'Enter') renameGroup(group.id, renamingGroup.name.trim() || group.name);
                         if (e.key === 'Escape') setRenamingGroup(null);
                       }}
-                      className="h-7 px-2 border border-accent rounded-md bg-bg-card text-[13.5px] font-medium text-foreground focus:outline-none"
+                      className="h-6 px-2 border border-accent/40 rounded bg-bg-card text-[13px] font-medium text-foreground focus:outline-none"
                     />
                   ) : (
                     <button
                       type="button"
                       onClick={() => setRenamingGroup({ id: group.id, name: group.name })}
-                      className="text-[13.5px] font-medium text-foreground hover:text-accent-2 transition-colors flex items-center gap-1.5 group"
-                      title="Rename"
+                      className="text-[13px] font-medium text-foreground hover:text-accent transition-colors flex items-center gap-1.5 group"
                     >
                       {group.name}
                       <Edit2 className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-opacity" />
                     </button>
                   )}
-                  <span className="pill text-[11px]">
-                    {group.memberCount} monitor{group.memberCount !== 1 ? 's' : ''}
-                  </span>
+                  <span className="pill text-[10.5px]">{group.memberCount} monitor{group.memberCount !== 1 ? 's' : ''}</span>
                   {group.activeCount > 0 && group.activeCount < group.memberCount && (
-                    <span className="text-[11px] text-ink-4">
-                      ({group.activeCount} active)
-                    </span>
+                    <span className="text-[11px] text-ink-5">({group.activeCount} active)</span>
                   )}
-                  <span className="text-[11.5px] text-ink-4 font-mono truncate flex-1">{group.baseUrl}</span>
-                  <div className="flex items-center gap-1 shrink-0">
+                  <span className="text-[11px] text-ink-5 font-mono truncate flex-1">{group.baseUrl}</span>
+                  <div className="flex items-center gap-0.5 shrink-0">
                     <button
                       type="button"
                       onClick={() => togglePauseGroup(group.id, !allActive)}
-                      className="p-1.5 text-ink-4 hover:text-foreground hover:bg-bg-soft rounded-md transition-colors"
-                      title={allActive ? 'Pause all in group' : 'Resume all in group'}
+                      className="p-1.5 text-ink-4 hover:text-foreground hover:bg-white/[0.05] rounded transition-colors"
                     >
-                      {allActive ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 fill-current" />}
+                      {allActive ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5 fill-current" />}
                     </button>
                     <button
                       type="button"
                       onClick={() => setDeleteGroupId(group.id)}
-                      className="p-1.5 text-ink-4 hover:text-red hover:bg-red-bg rounded-md transition-colors"
-                      title="Delete group + all monitors"
+                      className="p-1.5 text-ink-4 hover:text-red rounded transition-colors"
                     >
-                      <Trash2 className="w-4 h-4" />
+                      <Trash2 className="w-3.5 h-3.5" />
                     </button>
                   </div>
                 </div>
                 {!collapsed && groupMonitors.length > 0 && (
-                  <div className="border-t border-line-soft bg-bg-soft/30 divide-y divide-line-soft">
+                  <div className="border-t border-white/[0.04] divide-y divide-white/[0.03]">
                     {groupMonitors.map((m) => (
                       <Link
                         key={m.id}
                         href={`/monitors/${m.id}`}
-                        className="flex items-center gap-3 px-5 py-2 hover:bg-bg-soft/60 transition-colors"
+                        className="flex items-center gap-3 px-5 py-2 hover:bg-white/[0.025] transition-colors"
                       >
-                        <span className={cn('pill text-[10px]', m.isActive ? 'live' : 'paused')}>
-                          <span className="dot" />
-                          {m.isActive ? 'Active' : 'Paused'}
-                        </span>
+                        <div className={cn(
+                          'w-1.5 h-1.5 rounded-full shrink-0',
+                          m.isActive ? 'bg-green sd-dot-live' : 'bg-ink-5'
+                        )} />
                         <span className="text-[12.5px] text-foreground truncate flex-1">{m.name}</span>
-                        <span className="text-[11px] text-ink-4 font-mono truncate max-w-[280px]">{m.url}</span>
+                        <span className="text-[11px] text-ink-5 font-mono truncate max-w-[260px]">{m.url}</span>
                       </Link>
                     ))}
                   </div>
@@ -369,26 +353,29 @@ export default function MonitorsPage() {
         </div>
       )}
 
-      {/* Table */}
-      <div className="bg-bg-card border border-line rounded-[14px] overflow-hidden">
+      {/* Monitor list */}
+      <div className="bg-bg-card border border-line rounded-[12px] overflow-hidden">
         {/* Toolbar */}
-        <div className="px-5 py-3.5 border-b border-line flex flex-wrap items-center gap-3">
-          <div className="relative flex-1 max-w-[320px]">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-4" />
+        <div className="px-4 py-3 border-b border-white/[0.06] flex flex-wrap items-center gap-3">
+          <div className="relative flex-1 max-w-[280px]">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-ink-5" />
             <input
               type="text"
               placeholder="Search monitors..."
               value={searchQuery}
               onChange={(e) => { setSearchQuery(e.target.value); setCurrentPage(1); }}
-              className="w-full h-9 pl-9 pr-3 border border-line rounded-lg bg-bg-card text-[13.5px] text-foreground focus:outline-none focus:border-accent focus:ring-[3px] focus:ring-accent/18 transition-all"
+              className="w-full h-8 pl-8 pr-3 border border-white/[0.08] rounded-md bg-white/[0.04] text-[13px] text-foreground placeholder:text-ink-5 focus:outline-none focus:border-accent/40 focus:ring-[2px] focus:ring-accent/12 transition-all"
             />
           </div>
-          <div className="flex gap-1.5">
+          <div className="flex gap-1">
             {filters.map((f) => (
               <button
                 key={f.key}
                 onClick={() => { setFilter(f.key); setCurrentPage(1); }}
-                className={cn('filter-pill', filter === f.key && 'active')}
+                className={cn(
+                  'filter-pill text-[12px] h-8',
+                  filter === f.key && 'active'
+                )}
               >
                 {f.label}
               </button>
@@ -396,19 +383,30 @@ export default function MonitorsPage() {
           </div>
         </div>
 
+        {/* Column headers */}
+        {!loading && paginatedMonitors.length > 0 && (
+          <div className="flex items-center gap-4 px-4 py-2 border-b border-white/[0.04] bg-white/[0.015]">
+            <span className="flex-1 text-[10.5px] uppercase tracking-[0.09em] text-ink-5 font-semibold">Name</span>
+            <span className="text-[10.5px] uppercase tracking-[0.09em] text-ink-5 font-semibold w-20 shrink-0 hidden md:block">Status</span>
+            <span className="text-[10.5px] uppercase tracking-[0.09em] text-ink-5 font-semibold w-14 shrink-0 hidden lg:block">Freq</span>
+            <span className="text-[10.5px] uppercase tracking-[0.09em] text-ink-5 font-semibold w-20 shrink-0 hidden lg:block">Checked</span>
+            <span className="text-[10.5px] uppercase tracking-[0.09em] text-ink-5 font-semibold w-28 shrink-0 text-right">Actions</span>
+          </div>
+        )}
+
         {loading ? (
           <div className="flex items-center justify-center py-16">
-            <Loader2 className="w-6 h-6 text-accent animate-spin" />
+            <Loader2 className="w-5 h-5 text-accent animate-spin" />
           </div>
         ) : paginatedMonitors.length === 0 ? (
           <div className="text-center py-20 px-6">
             {searchQuery || filter !== 'all' ? (
               <>
-                <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-bg-muted border border-line mb-4">
-                  <Search className="w-6 h-6 text-ink-4" />
+                <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-white/[0.04] border border-white/[0.08] mb-4">
+                  <Search className="w-5 h-5 text-ink-4" />
                 </div>
-                <h3 className="text-[16px] font-semibold mb-2">No results found</h3>
-                <p className="text-ink-3 text-[14px] max-w-xs mx-auto">Try adjusting your search or filters.</p>
+                <h3 className="text-[15px] font-semibold mb-1.5 text-foreground">No results</h3>
+                <p className="text-ink-4 text-[13px] max-w-xs mx-auto">Try a different search or filter.</p>
                 <button
                   onClick={() => { setSearchQuery(''); setFilter('all'); }}
                   className="btn ghost sm mt-4"
@@ -418,126 +416,129 @@ export default function MonitorsPage() {
               </>
             ) : (
               <>
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-accent/8 border border-accent/15 mb-5">
-                  <Activity className="w-7 h-7 text-accent" />
+                <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-accent/[0.08] border border-accent/[0.14] mb-5">
+                  <Activity className="w-6 h-6 text-accent" />
                 </div>
-                <h3 className="text-[17px] font-semibold mb-2">No monitors yet</h3>
-                <p className="text-ink-3 text-[14px] max-w-sm mx-auto mb-5">Add your first monitor to start tracking website changes automatically.</p>
-                <Link href="/monitors/new" className="btn accent">
-                  <Plus className="w-4 h-4" />
-                  Add your first monitor
+                <h3 className="text-[16px] font-semibold mb-2 text-foreground">No monitors yet</h3>
+                <p className="text-ink-4 text-[13px] max-w-sm mx-auto mb-5 leading-relaxed">Add your first monitor to start tracking website changes.</p>
+                <Link href="/monitors/new" className="btn accent sm">
+                  <Plus className="w-3.5 h-3.5" />
+                  Add monitor
                 </Link>
               </>
             )}
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-[13.5px]">
-              <thead>
-                <tr className="bg-bg-soft text-ink-4 text-[11.5px] uppercase tracking-[0.08em] font-semibold">
-                  <th className="px-5 py-2.5">Name / URL</th>
-                  <th className="px-5 py-2.5">Status</th>
-                  <th className="px-5 py-2.5">Frequency</th>
-                  <th className="px-5 py-2.5">Last checked</th>
-                  <th className="px-5 py-2.5 text-right">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {paginatedMonitors.map((monitor) => (
-                  <tr key={monitor.id} className="border-t border-line-soft hover:bg-bg-soft/50 transition-colors">
-                    <td className="px-5 py-3.5">
-                      <Link href={`/monitors/${monitor.id}`} className="group">
-                        <div className="font-medium text-foreground group-hover:text-accent-2 transition-colors">{monitor.name}</div>
-                        <div className="text-xs text-ink-4 font-mono truncate max-w-[280px] mt-0.5">{monitor.url}</div>
-                      </Link>
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <button
-                        onClick={() => toggleStatus(monitor.id, monitor.isActive)}
-                        className={cn('pill text-[11px]', monitor.isActive ? 'live' : 'paused')}
-                      >
-                        <span className="dot" />
-                        {monitor.isActive ? 'Active' : 'Paused'}
-                      </button>
-                    </td>
-                    <td className="px-5 py-3.5 text-ink-3 font-mono text-xs">
-                      {monitor.checkIntervalMinutes >= 60
-                        ? `Every ${monitor.checkIntervalMinutes / 60}h`
-                        : `Every ${monitor.checkIntervalMinutes}m`}
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <span
-                        className="text-ink-4 text-xs font-mono cursor-default"
-                        title={monitor.lastCheckedAt ? new Date(monitor.lastCheckedAt).toLocaleString() : 'Never checked'}
-                      >
-                        {relativeTime(monitor.lastCheckedAt)}
-                      </span>
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <div className="flex items-center justify-end gap-0.5">
-                        <button
-                          onClick={() => runManualCheck(monitor.id)}
-                          className={cn(
-                            "p-1.5 rounded-md transition-colors",
-                            user?.plan === 'pro' && (user?.manualChecksUsedThisPeriod ?? 0) < 50
-                              ? "text-accent-2 hover:bg-accent/8"
-                              : "text-ink-5 cursor-not-allowed opacity-40"
-                          )}
-                          title={user?.plan !== 'pro' ? 'Pro plan only' : (user?.manualChecksUsedThisPeriod ?? 0) >= 50 ? 'Monthly manual check limit reached' : 'Check now'}
-                          disabled={user?.plan !== 'pro' || (user?.manualChecksUsedThisPeriod ?? 0) >= 50}
-                        >
-                          <Play className="w-4 h-4 fill-current" />
-                        </button>
-                        <Link
-                          href={`/monitors/${monitor.id}`}
-                          className="p-1.5 text-ink-4 hover:text-accent hover:bg-accent/8 rounded-md transition-colors"
-                          title="View diffs"
-                        >
-                          <Eye className="w-4 h-4" />
-                        </Link>
-                        <Link
-                          href={`/monitors/${monitor.id}/edit`}
-                          className="p-1.5 text-ink-4 hover:text-foreground hover:bg-bg-soft rounded-md transition-colors"
-                          title="Edit"
-                        >
-                          <Settings2 className="w-4 h-4" />
-                        </Link>
-                        <button
-                          onClick={() => setDeleteConfirmId(monitor.id)}
-                          className="p-1.5 text-ink-4 hover:text-red hover:bg-red-bg rounded-md transition-colors"
-                          title="Delete"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div>
+            {paginatedMonitors.map((monitor, i) => (
+              <div
+                key={monitor.id}
+                className="sd-sweep flex items-center gap-4 px-4 py-3 border-b border-white/[0.04] last:border-0 hover:bg-white/[0.025] transition-colors group"
+                style={{ '--i': i } as React.CSSProperties}
+              >
+                {/* Status dot */}
+                <div className={cn(
+                  'w-1.5 h-1.5 rounded-full shrink-0',
+                  monitor.isActive ? 'bg-green sd-dot-live' : 'bg-ink-5'
+                )} />
+
+                {/* Name + URL */}
+                <div className="flex-1 min-w-0">
+                  <Link href={`/monitors/${monitor.id}`} className="group/link block">
+                    <div className="text-[13.5px] font-medium text-foreground group-hover/link:text-accent transition-colors leading-tight truncate">
+                      {monitor.name}
+                    </div>
+                    <div className="text-[11.5px] text-ink-5 font-mono truncate mt-0.5">{monitor.url}</div>
+                  </Link>
+                </div>
+
+                {/* Status pill */}
+                <button
+                  onClick={() => toggleStatus(monitor.id, monitor.isActive)}
+                  className={cn('pill text-[11px] shrink-0 hidden md:inline-flex', monitor.isActive ? 'live' : 'paused')}
+                >
+                  <span className="dot" />
+                  {monitor.isActive ? 'Active' : 'Paused'}
+                </button>
+
+                {/* Frequency */}
+                <span className="text-[11.5px] text-ink-5 font-mono shrink-0 w-14 hidden lg:block">
+                  {monitor.checkIntervalMinutes >= 60
+                    ? `${monitor.checkIntervalMinutes / 60}h`
+                    : `${monitor.checkIntervalMinutes}m`}
+                </span>
+
+                {/* Last checked */}
+                <span
+                  className="text-[11.5px] text-ink-5 font-mono shrink-0 w-20 hidden lg:block"
+                  title={monitor.lastCheckedAt ? new Date(monitor.lastCheckedAt).toLocaleString() : 'Never'}
+                >
+                  {relativeTime(monitor.lastCheckedAt)}
+                </span>
+
+                {/* Actions */}
+                <div className="flex items-center gap-0.5 shrink-0 w-28 justify-end">
+                  <button
+                    onClick={() => runManualCheck(monitor.id)}
+                    disabled={user?.plan !== 'pro' || (user?.manualChecksUsedThisPeriod ?? 0) >= 50}
+                    className={cn(
+                      "p-1.5 rounded transition-colors",
+                      user?.plan === 'pro' && (user?.manualChecksUsedThisPeriod ?? 0) < 50
+                        ? "text-accent hover:bg-accent/[0.1]"
+                        : "text-ink-5 opacity-30 cursor-not-allowed"
+                    )}
+                    title={user?.plan !== 'pro' ? 'Pro plan only' : (user?.manualChecksUsedThisPeriod ?? 0) >= 50 ? 'Limit reached' : 'Run check now'}
+                  >
+                    <Play className="w-3.5 h-3.5 fill-current" />
+                  </button>
+                  <Link
+                    href={`/monitors/${monitor.id}`}
+                    className="p-1.5 text-ink-4 hover:text-accent hover:bg-accent/[0.08] rounded transition-colors"
+                    title="View diffs"
+                  >
+                    <Eye className="w-3.5 h-3.5" />
+                  </Link>
+                  <Link
+                    href={`/monitors/${monitor.id}/edit`}
+                    className="p-1.5 text-ink-4 hover:text-foreground hover:bg-white/[0.06] rounded transition-colors"
+                    title="Edit"
+                  >
+                    <Settings2 className="w-3.5 h-3.5" />
+                  </Link>
+                  <button
+                    onClick={() => setDeleteConfirmId(monitor.id)}
+                    className="p-1.5 text-ink-4 hover:text-red hover:bg-red-bg rounded transition-colors"
+                    title="Delete"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
         )}
 
+        {/* Pagination */}
         {filteredMonitors.length > 0 && (
-          <div className="px-5 py-3 border-t border-line flex items-center justify-between">
-            <p className="text-xs text-ink-4">
+          <div className="px-4 py-3 border-t border-white/[0.04] flex items-center justify-between">
+            <p className="text-[11.5px] text-ink-5 font-mono">
               {totalPages > 1
-                ? `Showing ${(currentPage - 1) * itemsPerPage + 1}–${Math.min(currentPage * itemsPerPage, filteredMonitors.length)} of ${filteredMonitors.length}`
+                ? `${(currentPage - 1) * itemsPerPage + 1}–${Math.min(currentPage * itemsPerPage, filteredMonitors.length)} of ${filteredMonitors.length}`
                 : `${filteredMonitors.length} monitor${filteredMonitors.length !== 1 ? 's' : ''}`}
             </p>
             {totalPages > 1 && (
-              <div className="flex gap-2">
+              <div className="flex gap-1.5">
                 <button
                   disabled={currentPage === 1}
                   onClick={() => setCurrentPage(prev => prev - 1)}
-                  className="btn ghost sm disabled:opacity-40"
+                  className="btn ghost sm disabled:opacity-30 h-7 text-[12px]"
                 >
                   Previous
                 </button>
                 <button
                   disabled={currentPage === totalPages}
                   onClick={() => setCurrentPage(prev => prev + 1)}
-                  className="btn ghost sm disabled:opacity-40"
+                  className="btn ghost sm disabled:opacity-30 h-7 text-[12px]"
                 >
                   Next
                 </button>

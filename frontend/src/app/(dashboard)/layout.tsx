@@ -7,7 +7,6 @@ import Link from 'next/link';
 import { Loader2, Menu, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { GlobalSearch } from '@/components/dashboard/GlobalSearch';
-import { ThemeToggle } from '@/components/ThemeToggle';
 import { Logo } from '@/components/Logo';
 
 const monitorNavItems = [
@@ -136,8 +135,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-bg-soft">
-        <Loader2 className="w-8 h-8 text-accent animate-spin" />
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Loader2 className="w-6 h-6 text-accent animate-spin" />
       </div>
     );
   }
@@ -159,7 +158,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const manualQuotaLimit = 50;
   const manualQuotaPercent = Math.min((manualQuotaUsed / manualQuotaLimit) * 100, 100);
 
-  // Calculate days until period reset
   const daysLeft = user?.periodResetAt
     ? Math.max(0, Math.ceil((new Date(user.periodResetAt).getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
     : 0;
@@ -169,186 +167,172 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     : '??';
 
   return (
-    <div className="min-h-screen bg-bg-soft text-foreground flex relative flex-col">
+    <div className="min-h-screen bg-background text-foreground flex relative flex-col">
       {maintenanceBanner?.mode && (
-        <div className="bg-yellow-500/15 border-b border-yellow-500/30 px-6 py-2.5 text-[13px] text-yellow-400 font-medium text-center shrink-0">
+        <div className="bg-amber/[0.12] border-b border-amber/30 px-6 py-2.5 text-[13px] text-amber font-medium text-center shrink-0">
           Maintenance in progress — some features are temporarily unavailable.
           {maintenanceBanner.message && ` ${maintenanceBanner.message}`}
         </div>
       )}
       <div className="flex flex-1 min-h-0 relative">
-      <GlobalSearch />
+        <GlobalSearch />
 
-      {/* Mobile Backdrop */}
-      {isMobileMenuOpen && (
-        <div
-          className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 md:hidden"
-          onClick={() => setIsMobileMenuOpen(false)}
-        />
-      )}
+        {isMobileMenuOpen && (
+          <div
+            className="fixed inset-0 bg-black/50 z-40 md:hidden"
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
+        )}
 
-      {/* Sidebar */}
-      <aside className={cn(
-        "fixed inset-y-0 left-0 z-50 w-[260px] bg-bg-card border-r border-line flex flex-col transition-transform duration-300 md:sticky md:top-0 md:h-screen md:translate-x-0 shrink-0",
-        isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
-      )}>
-        {/* Brand Logo */}
-        <div className="px-6 pt-7 pb-4 shrink-0">
-          <Logo className="h-7" />
-        </div>
+        {/* Sidebar */}
+        <aside className={cn(
+          "fixed inset-y-0 left-0 z-50 w-[248px] bg-sd-chrome border-r border-white/[0.06] flex flex-col transition-transform duration-300 md:sticky md:top-0 md:h-screen md:translate-x-0 shrink-0",
+          isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
+        )}>
+          {/* Brand */}
+          <div className="px-5 pt-6 pb-4 shrink-0">
+            <Logo className="h-6" />
+          </div>
 
-        {/* Workspace header */}
-        <div className="flex items-center justify-between px-4 py-4 gap-2 shrink-0 border-b border-line/50 mx-2 mb-2">
-          <div className="flex items-center gap-2.5 min-w-0 px-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent to-cyan-300 text-[#042F36] font-bold text-[14px] flex items-center justify-center shrink-0">
+          {/* Workspace */}
+          <div className="flex items-center gap-2.5 px-3 py-2 mx-2 mb-3 rounded-lg hover:bg-white/[0.04] transition-colors cursor-default shrink-0">
+            <div className="w-7 h-7 rounded-md bg-gradient-to-br from-accent to-cyan-300 text-[#042F36] font-bold text-[12px] flex items-center justify-center shrink-0">
               {userInitials[0] || 'N'}
             </div>
             <div className="min-w-0 flex-1">
-              <div className="text-[13.5px] font-semibold text-foreground truncate leading-tight" title={user?.name || ''}>
+              <div className="text-[13px] font-semibold text-dark-ink-2 truncate leading-tight" title={user?.name || ''}>
                 {user?.name || 'Workspace'}
               </div>
-              <div className="text-[11.5px] text-ink-4 capitalize mt-0.5">{user?.plan} plan</div>
+              <div className="text-[11px] text-dark-ink-3 capitalize">{user?.plan} plan</div>
             </div>
           </div>
-          <div className="shrink-0">
-            <ThemeToggle />
-          </div>
-        </div>
 
-        {/* Nav links */}
-        <nav className="flex-1 px-4 py-2 overflow-y-auto flex flex-col gap-0.5 custom-scrollbar">
-          {monitorNavItems.map((item) => (
-            <Link
-              key={item.id}
-              href={item.href}
-              onClick={() => setIsMobileMenuOpen(false)}
-              className={cn(
-                "flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-[13.5px] font-medium transition-colors shrink-0",
-                isActive(item.href)
-                  ? "bg-accent/8 text-accent-2 [&_svg]:text-accent-2 shadow-[inset_0_0_0_1px_rgba(6,182,212,0.1)]"
-                  : "text-ink-3 [&_svg]:text-ink-4 hover:bg-bg-muted hover:text-foreground"
-              )}
-            >
-              {item.icon}
-              {item.label}
-            </Link>
-          ))}
-
-          <div className="text-[11px] uppercase tracking-[0.08em] text-ink-5 font-bold px-3 pt-6 pb-2 shrink-0">
-            Settings
-          </div>
-          {settingsNavItems.map((item) => (
-            <Link
-              key={item.id}
-              href={item.href}
-              onClick={() => setIsMobileMenuOpen(false)}
-              className={cn(
-                "flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-[13.5px] font-medium transition-colors shrink-0",
-                isActive(item.href)
-                  ? "bg-accent/8 text-accent-2 [&_svg]:text-accent-2 shadow-[inset_0_0_0_1px_rgba(6,182,212,0.1)]"
-                  : "text-ink-3 [&_svg]:text-ink-4 hover:bg-bg-muted hover:text-foreground"
-              )}
-            >
-              {item.icon}
-              {item.label}
-            </Link>
-          ))}
-
-          <div className="mt-auto pt-4 mb-2">
-            <button
-              onClick={handleLogout}
-              className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-[13.5px] font-medium text-ink-4 hover:bg-red-bg hover:text-red-ink transition-colors"
-            >
-              <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.7" className="w-4 h-4">
-                <path d="M6 2H4a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2M11 11l3-3-3-3M14 8H6" />
-              </svg>
-              Sign out
-            </button>
-          </div>
-        </nav>
-
-        {/* Quota box - Pinned to bottom */}
-        <div className="px-4 pb-6 pt-2 shrink-0 border-t border-line/50 bg-bg-card/50 backdrop-blur-sm flex flex-col gap-3">
-          {/* Main Quota */}
-          <div className="bg-bg-muted/50 border border-line rounded-[10px] p-3.5">
-            <div className="flex items-center justify-between mb-2">
-              <h5 className="text-[11.5px] uppercase tracking-[0.08em] text-ink-4 font-semibold">
-                Monthly quota
-              </h5>
-              {daysLeft > 0 && (
-                <span className="text-[10.5px] text-ink-4">Resets in {daysLeft}d</span>
-              )}
-            </div>
-            <div className="h-1.5 rounded-full bg-line overflow-hidden mb-2">
-              <div
+          {/* Nav */}
+          <nav className="flex-1 px-2 py-1 overflow-y-auto flex flex-col gap-0.5 custom-scrollbar">
+            {monitorNavItems.map((item) => (
+              <Link
+                key={item.id}
+                href={item.href}
+                onClick={() => setIsMobileMenuOpen(false)}
                 className={cn(
-                  "h-full rounded-full transition-all duration-500",
-                  quotaPercent >= 90
-                    ? "bg-red"
-                    : quotaPercent >= 70
-                    ? "bg-gradient-to-r from-yellow-400 to-orange-400"
-                    : "bg-gradient-to-r from-accent to-cyan-300"
+                  "flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] font-medium transition-colors shrink-0",
+                  isActive(item.href)
+                    ? "bg-accent/[0.15] text-accent [&_svg]:text-accent"
+                    : "text-dark-ink [&_svg]:text-dark-ink-3 hover:bg-white/[0.04] hover:text-dark-ink-2"
                 )}
-                style={{ width: `${quotaPercent}%` }}
-              />
-            </div>
-            <div className="font-mono text-xs text-ink-3 flex justify-between">
-              <span><span className="font-medium text-foreground">{quotaUsed.toLocaleString()}</span> used</span>
-              <span>of {quotaLimit.toLocaleString()}</span>
-            </div>
-          </div>
+              >
+                {item.icon}
+                {item.label}
+                {item.pro && (
+                  <span className="ml-auto text-[9.5px] font-semibold uppercase tracking-[0.06em] text-accent/60 border border-accent/20 rounded-full px-1.5 py-0.5">
+                    Pro
+                  </span>
+                )}
+              </Link>
+            ))}
 
-          {/* Manual Quota */}
-          <div className="bg-bg-muted/50 border border-line rounded-[10px] p-3.5">
-            <div className="flex items-center justify-between mb-2">
-              <h5 className="text-[11.5px] uppercase tracking-[0.08em] text-ink-4 font-semibold">
-                Manual checks
-              </h5>
-              {user?.plan !== 'pro' && (
-                <span className="text-[10px] text-ink-4 bg-bg-soft border border-line px-1.5 py-0.5 rounded-full">Pro</span>
-              )}
+            <div className="text-[10px] uppercase tracking-[0.1em] text-dark-ink-3 font-semibold px-3 pt-5 pb-1.5 shrink-0">
+              Settings
             </div>
-            <div className="h-1.5 rounded-full bg-line overflow-hidden mb-2">
-              <div
-                className="h-full bg-accent-2 rounded-full transition-all duration-500"
-                style={{ width: user?.plan === 'pro' ? `${manualQuotaPercent}%` : '0%' }}
-              />
-            </div>
-            <div className="font-mono text-xs text-ink-3 flex justify-between">
-              <span>
-                <span className="font-medium text-foreground">
-                  {user?.plan === 'pro' ? manualQuotaUsed : '0'}
-                </span> used
-              </span>
-              <span>of {manualQuotaLimit}</span>
-            </div>
-          </div>
-        </div>
-      </aside>
+            {settingsNavItems.map((item) => (
+              <Link
+                key={item.id}
+                href={item.href}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className={cn(
+                  "flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] font-medium transition-colors shrink-0",
+                  isActive(item.href)
+                    ? "bg-accent/[0.15] text-accent [&_svg]:text-accent"
+                    : "text-dark-ink [&_svg]:text-dark-ink-3 hover:bg-white/[0.04] hover:text-dark-ink-2"
+                )}
+              >
+                {item.icon}
+                {item.label}
+              </Link>
+            ))}
 
-      {/* Main Content */}
-      <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        {/* Mobile Header */}
-        <header className="h-14 flex items-center justify-between px-4 border-b border-line bg-bg-card z-30 sticky top-0 md:hidden">
-          <button
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="p-2 text-ink-3 hover:text-foreground"
-          >
-            {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
-          <Logo className="h-7" />
-          <div className="flex items-center gap-2">
-            <ThemeToggle />
-            <div className="w-4" />
-          </div>
-        </header>
+            <div className="mt-auto pt-3 pb-1">
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] font-medium text-dark-ink-3 hover:bg-white/[0.04] hover:text-red transition-colors"
+              >
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.7" className="w-4 h-4">
+                  <path d="M6 2H4a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2M11 11l3-3-3-3M14 8H6" />
+                </svg>
+                Sign out
+              </button>
+            </div>
+          </nav>
 
-        <div className="flex-1 overflow-y-auto p-5 md:py-8 md:px-10">
-          <div className="max-w-[1200px] mx-auto">
-            {children}
+          {/* Quota */}
+          <div className="px-3 pb-5 pt-3 shrink-0 border-t border-white/[0.06] flex flex-col gap-2.5">
+            <div className="rounded-[8px] p-3 bg-white/[0.03] border border-white/[0.06]">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10.5px] uppercase tracking-[0.08em] text-dark-ink-3 font-semibold">Quota</span>
+                {daysLeft > 0 && (
+                  <span className="text-[10px] text-dark-ink-3">Resets in {daysLeft}d</span>
+                )}
+              </div>
+              <div className="h-1 rounded-full bg-white/[0.08] overflow-hidden mb-2">
+                <div
+                  className={cn(
+                    "h-full rounded-full transition-all duration-500",
+                    quotaPercent >= 90 ? "bg-red" : quotaPercent >= 70 ? "bg-amber" : "bg-accent"
+                  )}
+                  style={{ width: `${quotaPercent}%` }}
+                />
+              </div>
+              <div className="font-mono text-[11px] text-dark-ink-3 flex justify-between">
+                <span><span className="text-dark-ink-2 font-medium">{quotaUsed.toLocaleString()}</span> used</span>
+                <span>{quotaLimit.toLocaleString()}</span>
+              </div>
+            </div>
+
+            <div className="rounded-[8px] p-3 bg-white/[0.03] border border-white/[0.06]">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-[10.5px] uppercase tracking-[0.08em] text-dark-ink-3 font-semibold">Manual checks</span>
+                {user?.plan !== 'pro' && (
+                  <span className="text-[9.5px] text-accent/60 border border-accent/20 rounded-full px-1.5 py-0.5">Pro</span>
+                )}
+              </div>
+              <div className="h-1 rounded-full bg-white/[0.08] overflow-hidden mb-2">
+                <div
+                  className="h-full bg-accent-2 rounded-full transition-all duration-500"
+                  style={{ width: user?.plan === 'pro' ? `${manualQuotaPercent}%` : '0%' }}
+                />
+              </div>
+              <div className="font-mono text-[11px] text-dark-ink-3 flex justify-between">
+                <span>
+                  <span className="text-dark-ink-2 font-medium">
+                    {user?.plan === 'pro' ? manualQuotaUsed : '0'}
+                  </span> used
+                </span>
+                <span>{manualQuotaLimit}</span>
+              </div>
+            </div>
           </div>
-        </div>
-      </main>
+        </aside>
+
+        {/* Main */}
+        <main className="flex-1 flex flex-col min-w-0 overflow-hidden bg-background">
+          {/* Mobile header */}
+          <header className="h-13 flex items-center justify-between px-4 border-b border-white/[0.06] bg-sd-chrome z-30 sticky top-0 md:hidden">
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="p-2 text-dark-ink-3 hover:text-dark-ink"
+            >
+              {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+            <Logo className="h-6" />
+            <div className="w-9" />
+          </header>
+
+          <div className="flex-1 overflow-y-auto py-8 px-5 md:px-10">
+            <div className="max-w-[1160px] mx-auto">
+              {children}
+            </div>
+          </div>
+        </main>
       </div>
     </div>
   );

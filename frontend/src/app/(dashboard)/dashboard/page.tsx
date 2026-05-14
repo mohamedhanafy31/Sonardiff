@@ -3,14 +3,28 @@
 import { useAuthStore } from '@/lib/store';
 import { api } from '@/lib/api';
 import { useEffect, useState } from 'react';
-import { Loader2, Plus, Clock, Activity } from 'lucide-react';
+import { Loader2, Plus, Activity, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
+import { cn } from '@/lib/utils';
 
 interface DashboardStats {
   activeMonitors: number;
   checksToday: number;
   changesDetected: number;
   recentDiffs: any[];
+}
+
+function relativeTime(dateStr: string | null): string {
+  if (!dateStr) return 'Never';
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return 'Just now';
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  const days = Math.floor(hrs / 24);
+  if (days < 7) return `${days}d ago`;
+  return new Date(dateStr).toLocaleDateString();
 }
 
 export default function DashboardPage() {
@@ -42,158 +56,146 @@ export default function DashboardPage() {
   const quotaLimit = user?.planLimit ?? 500;
   const quotaPercent = Math.min((quotaUsed / quotaLimit) * 100, 100);
 
-  const kpiCards = [
-    { label: 'Active monitors', value: stats?.activeMonitors ?? 0 },
-    { label: 'Checks today', value: stats?.checksToday ?? 0 },
-    { label: 'Changes detected', value: stats?.changesDetected ?? 0 },
-    { label: 'Quota used', value: `${Math.round(quotaPercent)}%` },
-  ];
-
   return (
     <div>
-      {/* Page head */}
-      <div className="flex justify-between items-end flex-wrap gap-5 mb-7">
+      {/* Header */}
+      <div className="sd-header flex justify-between items-end flex-wrap gap-5 mb-8">
         <div>
-          <h1 className="font-display text-[28px] font-semibold tracking-tight">Dashboard</h1>
-          <div className="text-ink-3 text-[14.5px] mt-1">Welcome back, {user?.name}</div>
+          <h1 className="text-[24px] font-semibold tracking-tight text-foreground">Overview</h1>
+          <p className="text-ink-4 text-[13px] mt-0.5">
+            {user?.name ? `Welcome back, ${user.name.split(' ')[0]}.` : 'Your monitoring summary.'}
+          </p>
         </div>
-        <Link href="/monitors/new" className="btn accent">
-          <Plus className="w-4 h-4" />
-          Add monitor
+        <Link href="/monitors/new" className="btn accent sm">
+          <Plus className="w-3.5 h-3.5" />
+          New monitor
         </Link>
       </div>
 
       {loading ? (
         <div className="flex items-center justify-center py-20">
-          <Loader2 className="w-6 h-6 text-accent animate-spin" />
+          <Loader2 className="w-5 h-5 text-accent animate-spin" />
         </div>
       ) : (
         <>
-          {/* KPI row */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            {kpiCards.map((kpi) => (
-              <div key={kpi.label} className="bg-bg-card border border-line rounded-[14px] p-5">
-                <div className="text-[11.5px] uppercase tracking-[0.08em] text-ink-4 font-semibold">
-                  {kpi.label}
+          {/* Status strip — not a card grid */}
+          <div className="sd-sweep flex flex-wrap items-center gap-px mb-8 rounded-[10px] overflow-hidden border border-white/[0.06] bg-bg-card">
+            {[
+              { value: stats?.activeMonitors ?? 0, label: 'active monitors' },
+              { value: stats?.checksToday ?? 0, label: 'checks today' },
+              { value: stats?.changesDetected ?? 0, label: 'changes detected' },
+              { value: `${Math.round(quotaPercent)}%`, label: 'quota used' },
+            ].map((item, i) => (
+              <div
+                key={item.label}
+                className={cn(
+                  'flex-1 min-w-[120px] px-6 py-5',
+                  i > 0 && 'border-l border-white/[0.06]'
+                )}
+              >
+                <div className="text-[28px] font-semibold font-display text-foreground leading-none">
+                  {item.value}
                 </div>
-                <div className="font-display text-[28px] font-semibold tracking-tight mt-1 leading-none">
-                  {kpi.value}
-                </div>
+                <div className="text-[12px] text-ink-5 mt-1.5">{item.label}</div>
               </div>
             ))}
           </div>
 
-          {/* Monitor table */}
-          <div className="bg-bg-card border border-line rounded-[14px] overflow-hidden mb-6">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-line">
-              <h3 className="text-[14px] font-semibold">Monitors</h3>
-              <span className="text-xs text-ink-4 font-mono">{monitors.length} total</span>
+          {/* Monitors list */}
+          <div className="sd-sweep bg-bg-card border border-line rounded-[12px] overflow-hidden mb-5" style={{ '--i': 1 } as React.CSSProperties}>
+            <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/[0.06]">
+              <h3 className="text-[13.5px] font-semibold text-foreground">Monitors</h3>
+              <Link href="/monitors" className="text-[12px] text-accent hover:text-accent-2 transition-colors flex items-center gap-1">
+                View all
+                <ArrowRight className="w-3 h-3" />
+              </Link>
             </div>
 
             {monitors.length === 0 ? (
-              <div className="text-center py-16 px-6">
-                <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-bg-muted mb-4">
-                  <Clock className="w-6 h-6 text-ink-4" />
-                </div>
-                <h3 className="text-[16px] font-semibold mb-2">No monitors yet</h3>
-                <p className="text-ink-3 text-[14px] mb-6 max-w-sm mx-auto">
+              <div className="text-center py-14 px-6">
+                <h3 className="text-[15px] font-semibold mb-1.5 text-foreground">No monitors yet</h3>
+                <p className="text-ink-4 text-[13px] mb-5 max-w-sm mx-auto">
                   Create your first monitor to start tracking website changes.
                 </p>
-                <Link href="/monitors/new" className="btn accent">
-                  <Plus className="w-4 h-4" />
+                <Link href="/monitors/new" className="btn accent sm">
+                  <Plus className="w-3.5 h-3.5" />
                   Create monitor
                 </Link>
               </div>
             ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-[13.5px]">
-                  <thead>
-                    <tr className="bg-bg-soft text-ink-4 text-[11.5px] uppercase tracking-[0.08em] font-semibold">
-                      <th className="px-5 py-2.5">Name / URL</th>
-                      <th className="px-5 py-2.5">Status</th>
-                      <th className="px-5 py-2.5">Frequency</th>
-                      <th className="px-5 py-2.5">Last checked</th>
-                      <th className="px-5 py-2.5 text-right">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {monitors.slice(0, 10).map((monitor) => (
-                      <tr key={monitor.id} className="border-t border-line-soft hover:bg-bg-soft/50 transition-colors">
-                        <td className="px-5 py-3.5">
-                          <div className="font-medium text-foreground">{monitor.name}</div>
-                          <div className="text-xs text-ink-4 font-mono truncate max-w-[260px] mt-0.5">{monitor.url}</div>
-                        </td>
-                        <td className="px-5 py-3.5">
-                          <span className={`pill text-[11px] ${monitor.isActive ? 'live' : 'paused'}`}>
-                            <span className="dot" />
-                            {monitor.isActive ? 'Active' : 'Paused'}
-                          </span>
-                        </td>
-                        <td className="px-5 py-3.5 text-ink-3 font-mono text-xs">
-                          {monitor.checkIntervalMinutes >= 60
-                            ? `Every ${monitor.checkIntervalMinutes / 60}h`
-                            : `Every ${monitor.checkIntervalMinutes}m`}
-                        </td>
-                        <td className="px-5 py-3.5 text-ink-4 text-xs font-mono">
-                          {monitor.lastCheckedAt
-                            ? new Date(monitor.lastCheckedAt).toLocaleString()
-                            : 'Never'}
-                        </td>
-                        <td className="px-5 py-3.5 text-right">
-                          <Link
-                            href={`/monitors/${monitor.id}`}
-                            className="text-accent-2 text-xs font-medium hover:underline"
-                          >
-                            View
-                          </Link>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-
-            {monitors.length > 10 && (
-              <div className="px-5 py-3 border-t border-line-soft text-center">
-                <Link href="/monitors" className="text-accent-2 text-[13px] font-medium hover:underline">
-                  View all {monitors.length} monitors →
-                </Link>
+              <div>
+                {monitors.slice(0, 8).map((monitor) => (
+                  <Link
+                    key={monitor.id}
+                    href={`/monitors/${monitor.id}`}
+                    className="flex items-center gap-4 px-5 py-3 border-b border-white/[0.04] last:border-0 hover:bg-white/[0.025] transition-colors group"
+                  >
+                    <div className={cn(
+                      'w-1.5 h-1.5 rounded-full shrink-0',
+                      monitor.isActive ? 'bg-green sd-dot-live' : 'bg-ink-5'
+                    )} />
+                    <div className="flex-1 min-w-0">
+                      <div className="text-[13px] font-medium text-foreground group-hover:text-accent transition-colors truncate">
+                        {monitor.name}
+                      </div>
+                      <div className="text-[11px] text-ink-5 font-mono truncate mt-0.5">{monitor.url}</div>
+                    </div>
+                    <span className="text-[11.5px] text-ink-5 font-mono shrink-0 hidden sm:block">
+                      {relativeTime(monitor.lastCheckedAt)}
+                    </span>
+                  </Link>
+                ))}
+                {monitors.length > 8 && (
+                  <div className="px-5 py-3 border-t border-white/[0.04]">
+                    <Link href="/monitors" className="text-[12px] text-accent hover:text-accent-2 transition-colors">
+                      +{monitors.length - 8} more monitors
+                    </Link>
+                  </div>
+                )}
               </div>
             )}
           </div>
 
           {/* Recent activity */}
-          <div className="bg-bg-card border border-line rounded-[14px] overflow-hidden">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-line">
-              <h3 className="text-[14px] font-semibold">Recent activity</h3>
+          <div className="sd-sweep bg-bg-card border border-line rounded-[12px] overflow-hidden" style={{ '--i': 2 } as React.CSSProperties}>
+            <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/[0.06]">
+              <h3 className="text-[13.5px] font-semibold text-foreground">Recent changes</h3>
+              {stats?.recentDiffs && stats.recentDiffs.length > 0 && (
+                <Link href="/alerts" className="text-[12px] text-accent hover:text-accent-2 transition-colors flex items-center gap-1">
+                  All alerts
+                  <ArrowRight className="w-3 h-3" />
+                </Link>
+              )}
             </div>
 
             {!stats?.recentDiffs || stats.recentDiffs.length === 0 ? (
-              <div className="text-center py-12 px-6 text-ink-4 text-[14px]">
-                No changes detected yet. Activity will appear here once monitors detect diffs.
+              <div className="flex items-center gap-3 px-5 py-8 text-ink-5 text-[13px]">
+                <Activity className="w-4 h-4 shrink-0" />
+                No changes detected yet. Activity appears here when monitors find diffs.
               </div>
             ) : (
-              <div className="divide-y divide-line-soft">
+              <div>
                 {stats.recentDiffs.map((diff) => (
                   <Link
                     key={diff.id}
                     href={`/monitors/${diff.monitorId}/diffs/${diff.id}`}
-                    className="flex items-center gap-4 px-5 py-3.5 hover:bg-bg-soft/50 transition-colors"
+                    className="flex items-center gap-4 px-5 py-3.5 border-b border-white/[0.04] last:border-0 hover:bg-white/[0.025] transition-colors group"
                   >
-                    <div className="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center shrink-0">
-                      <Activity className="w-4 h-4 text-accent" />
+                    <div className="w-6 h-6 rounded-md bg-accent/[0.1] flex items-center justify-center shrink-0">
+                      <Activity className="w-3 h-3 text-accent" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="font-medium text-[13.5px]">Change detected</div>
-                      <div className="text-xs text-ink-4 truncate">{diff.changeSummary}</div>
+                      <div className="text-[13px] font-medium text-foreground group-hover:text-accent transition-colors truncate">
+                        Change detected
+                      </div>
+                      <div className="text-[11.5px] text-ink-5 truncate mt-0.5">{diff.changeSummary}</div>
                     </div>
                     <div className="text-right shrink-0">
-                      <div className="text-xs text-ink-3">
-                        {new Date(diff.detectedAt).toLocaleString()}
+                      <div className="text-[12px] text-ink-4 font-mono">
+                        {Number(diff.changePercentage).toFixed(1)}%
                       </div>
-                      <div className="text-[11px] text-ink-4 font-mono mt-0.5">
-                        {Number(diff.changePercentage).toFixed(1)}% diff
+                      <div className="text-[11px] text-ink-5 mt-0.5">
+                        {relativeTime(diff.detectedAt)}
                       </div>
                     </div>
                   </Link>

@@ -1,0 +1,240 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-05-14T00:00:00Z",
+  "title": "Design System: SonarDiff (Dark-First, Committed)",
+  "extensions": {
+    "colorMeta": {
+      "accent-cyan": {
+        "role": "primary",
+        "displayName": "Electric Cyan",
+        "canonical": "oklch(73.4% 0.134 213.7)",
+        "tonalRamp": ["#021f28", "#043645", "#065468", "#077590", "#089ab9", "#06B6D4", "#38c8e2", "#cffafe"]
+      },
+      "accent-cyan-deep": {
+        "role": "primary",
+        "displayName": "Cyan Deep",
+        "canonical": "oklch(62% 0.128 215.4)",
+        "tonalRamp": ["#011820", "#033040", "#055060", "#06718a", "#0891B2", "#0ba8cc", "#2dbde0", "#a5f3fc"]
+      },
+      "status-positive": {
+        "role": "tertiary",
+        "displayName": "Positive Green",
+        "canonical": "oklch(72% 0.175 158.6)",
+        "tonalRamp": ["#022b1a", "#044a2e", "#056b41", "#068f57", "#08b36e", "#10B981", "#34d399", "#d1fae5"]
+      },
+      "status-negative": {
+        "role": "tertiary",
+        "displayName": "Alert Red",
+        "canonical": "oklch(63% 0.218 27.3)",
+        "tonalRamp": ["#2d0808", "#4f0f0f", "#7a1616", "#aa1e1e", "#d92626", "#EF4444", "#f87171", "#fee2e2"]
+      },
+      "surface-chrome": {
+        "role": "neutral",
+        "displayName": "Surface Chrome",
+        "canonical": "oklch(5.5% 0.010 245)",
+        "tonalRamp": ["#010103", "#020306", "#03050a", "#05070A", "#070a10", "#0b1018", "#111a27", "#1e2b3e"]
+      },
+      "surface-base": {
+        "role": "neutral",
+        "displayName": "Surface Base",
+        "canonical": "oklch(7.5% 0.012 245)",
+        "tonalRamp": ["#010203", "#030407", "#05070d", "#07090C", "#0b0f16", "#131b25", "#1e2a3a", "#2d3d52"]
+      },
+      "surface-card": {
+        "role": "neutral",
+        "displayName": "Surface Card",
+        "canonical": "oklch(12% 0.048 249)",
+        "tonalRamp": ["#020509", "#050b14", "#08111f", "#0F172A", "#162035", "#1e2d46", "#263c5c", "#334e73"]
+      },
+      "surface-elevated": {
+        "role": "neutral",
+        "displayName": "Surface Elevated",
+        "canonical": "oklch(16% 0.042 248)",
+        "tonalRamp": ["#050b14", "#08111f", "#0F172A", "#162030", "#1e2d46", "#263c5c", "#334e73", "#42618f"]
+      },
+      "ink-primary": {
+        "role": "neutral",
+        "displayName": "Ink Primary",
+        "canonical": "oklch(96% 0.008 248)",
+        "tonalRamp": ["#94a3b8", "#b0bfcf", "#c8d4e0", "#CBD5E1", "#dce6f0", "#e8eef6", "#F1F5F9", "#f8fafc"]
+      }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display", "purpose": "Auth heroes. One per page. Ink Primary on Surface Base." },
+      "headline": { "displayName": "Headline", "purpose": "Page titles. One per screen." },
+      "title": { "displayName": "Title", "purpose": "Section headers, card headings, panel titles." },
+      "body": { "displayName": "Body", "purpose": "Descriptions, change summaries. Max 65ch. Ink Secondary on dark." },
+      "label": { "displayName": "Label (Eyebrow)", "purpose": "Category labels. Uppercase, spaced. Ink Tertiary. Once per section." },
+      "mono": { "displayName": "Mono", "purpose": "URLs, counts, percentages, timestamps, selectors. Ink Tertiary." }
+    },
+    "shadows": [
+      {
+        "name": "popover",
+        "value": "0 8px 32px rgba(0, 0, 0, 0.6), 0 2px 8px rgba(0, 0, 0, 0.4)",
+        "purpose": "Dropdowns, popovers, tooltips on dark surfaces. Heavy because L3/L1 surface delta is small."
+      },
+      {
+        "name": "accent-glow",
+        "value": "0 0 0 1px rgba(6, 182, 212, 0.4), 0 0 24px rgba(6, 182, 212, 0.2)",
+        "purpose": "The only glow. CTA accent button at rest and focused primary inputs."
+      },
+      {
+        "name": "frame",
+        "value": "0 24px 80px rgba(0, 0, 0, 0.7)",
+        "purpose": "Browser preview frame component. Once per major section."
+      }
+    ],
+    "motion": [
+      {
+        "name": "sweep-in",
+        "keyframes": "from { clip-path: inset(0 100% 0 0); opacity: 0; } to { clip-path: inset(0 0% 0 0); opacity: 1; }",
+        "duration": "350ms",
+        "easing": "cubic-bezier(0.19, 1, 0.22, 1)",
+        "stagger": "60ms",
+        "purpose": "The system's identity entrance. Applied to monitor rows, alert rows, page section headers on mount. Gated by prefers-reduced-motion. NOT for persistent chrome."
+      },
+      {
+        "name": "header-reveal",
+        "keyframes": "from { opacity: 0; filter: blur(4px); } to { opacity: 1; filter: blur(0); }",
+        "duration": "400ms",
+        "easing": "cubic-bezier(0.19, 1, 0.22, 1)",
+        "purpose": "Page header on route change. Blur-opacity reveal."
+      },
+      {
+        "name": "dot-pulse",
+        "keyframes": "0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(0.85); }",
+        "duration": "2s",
+        "easing": "ease-in-out",
+        "purpose": "Live status dot only. Loops ambient. Only the green dot; no other element loops."
+      },
+      {
+        "name": "lift",
+        "value": "translateY(-1px)",
+        "duration": "120ms",
+        "easing": "cubic-bezier(0.19, 1, 0.22, 1)",
+        "purpose": "Button hover lift. State transition, not entrance."
+      }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "xl", "value": "1280px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Accent CTA Button",
+      "kind": "button",
+      "refersTo": "button-accent",
+      "description": "The primary CTA. Cyan fill on dark background; the most visible element on any page. One per primary action zone.",
+      "html": "<button class=\"ds-btn-accent\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 16 16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><line x1=\"8\" y1=\"2\" x2=\"8\" y2=\"14\"/><line x1=\"2\" y1=\"8\" x2=\"14\" y2=\"8\"/></svg>Add monitor</button>",
+      "css": ".ds-btn-accent { display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 0 18px; height: 38px; border-radius: 10px; border: none; font-family: Inter, -apple-system, sans-serif; font-size: 14px; font-weight: 500; letter-spacing: -0.005em; background: #06B6D4; color: #042F36; cursor: pointer; box-shadow: 0 0 0 1px rgba(6,182,212,0.4), 0 0 24px rgba(6,182,212,0.2); transition: transform 0.12s cubic-bezier(0.19,1,0.22,1), background 0.15s ease; white-space: nowrap; } .ds-btn-accent:hover { background: #22D3EE; transform: translateY(-1px); } .ds-btn-accent:active { transform: translateY(0); } .ds-btn-accent:focus-visible { outline: none; box-shadow: 0 0 0 2px #06B6D4, 0 0 0 4px rgba(6,182,212,0.25); }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Secondary / cancel actions on dark. Stroke-only. Nearly invisible at rest; clarifies on hover.",
+      "html": "<button class=\"ds-btn-ghost\">Cancel</button>",
+      "css": ".ds-btn-ghost { display: inline-flex; align-items: center; justify-content: center; padding: 0 18px; height: 38px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.08); font-family: Inter, -apple-system, sans-serif; font-size: 14px; font-weight: 500; background: transparent; color: #CBD5E1; cursor: pointer; transition: background 0.15s ease, transform 0.12s cubic-bezier(0.19,1,0.22,1); white-space: nowrap; } .ds-btn-ghost:hover { background: rgba(255,255,255,0.04); transform: translateY(-1px); } .ds-btn-ghost:active { transform: translateY(0); } .ds-btn-ghost:focus-visible { outline: none; box-shadow: 0 0 0 2px #06B6D4; }"
+    },
+    {
+      "name": "Monitor Row (Sweep Entrance)",
+      "kind": "custom",
+      "refersTo": null,
+      "description": "The primary content unit. Dense list row. Clip-path sweep on mount, 60ms stagger. Action buttons appear on hover only.",
+      "html": "<div class=\"ds-monitor-row\" style=\"--index:0\"><span class=\"ds-status-dot ds-status-dot--live\"></span><div class=\"ds-row-main\"><span class=\"ds-row-name\">Competitor pricing</span><span class=\"ds-row-url\">acme.com/pricing</span></div><span class=\"ds-row-badge\">1h</span><span class=\"ds-row-meta\">14m ago</span><span class=\"ds-row-change ds-row-change--up\">+2.4%</span><div class=\"ds-row-actions\"><button class=\"ds-row-btn\" title=\"Pause\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 16 16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><rect x=\"4\" y=\"3\" width=\"3\" height=\"10\" rx=\"1\"/><rect x=\"9\" y=\"3\" width=\"3\" height=\"10\" rx=\"1\"/></svg></button></div></div>",
+      "css": "@keyframes sd-sweep-in { from { clip-path: inset(0 100% 0 0); opacity: 0; } to { clip-path: inset(0 0% 0 0); opacity: 1; } } @media (prefers-reduced-motion: reduce) { .ds-monitor-row { animation: none !important; opacity: 1 !important; clip-path: none !important; } } .ds-monitor-row { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.05); background: transparent; animation: sd-sweep-in 350ms cubic-bezier(0.19,1,0.22,1) both; animation-delay: calc(var(--index, 0) * 60ms); cursor: pointer; transition: background 0.12s ease; } .ds-monitor-row:hover { background: rgba(255,255,255,0.04); } .ds-monitor-row:hover .ds-row-actions { opacity: 1; } .ds-status-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; } .ds-status-dot--live { background: #10B981; box-shadow: 0 0 0 3px rgba(16,185,129,0.18); animation: dot-pulse 2s ease-in-out infinite; } @keyframes dot-pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(0.85); } } .ds-row-main { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; } .ds-row-name { font-family: Inter, sans-serif; font-size: 14px; font-weight: 500; color: #F1F5F9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .ds-row-url { font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11.5px; color: #64748B; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; } .ds-row-badge { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 999px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.08); font-family: 'Geist Mono', ui-monospace, monospace; font-size: 11px; color: #64748B; flex-shrink: 0; } .ds-row-meta { font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12px; color: #64748B; flex-shrink: 0; white-space: nowrap; } .ds-row-change { font-family: 'Geist Mono', ui-monospace, monospace; font-size: 12px; font-weight: 500; flex-shrink: 0; } .ds-row-change--up { color: #34D399; } .ds-row-change--down { color: #F87171; } .ds-row-actions { display: flex; gap: 4px; opacity: 0; transition: opacity 0.15s ease; flex-shrink: 0; } .ds-row-btn { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.04); color: #94A3B8; cursor: pointer; transition: background 0.12s ease, color 0.12s ease; } .ds-row-btn:hover { background: rgba(255,255,255,0.10); color: #F1F5F9; }"
+    },
+    {
+      "name": "URL Input (Dark)",
+      "kind": "input",
+      "refersTo": "input-default",
+      "description": "Mono font for URL, CSS selector, regex inputs. Surface Card background. Cyan border + ring on focus.",
+      "html": "<input class=\"ds-input-url\" type=\"url\" placeholder=\"https://competitor.com/pricing\" />",
+      "css": ".ds-input-url { display: block; width: 100%; height: 40px; padding: 0 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.08); background: #0F172A; font-family: 'Geist Mono', 'JetBrains Mono', ui-monospace, Menlo, monospace; font-size: 13px; color: #F1F5F9; transition: border-color 0.15s ease, box-shadow 0.15s ease; } .ds-input-url::placeholder { color: #475569; } .ds-input-url:focus { outline: none; border-color: #06B6D4; box-shadow: 0 0 0 3px rgba(6,182,212,0.15); } .ds-input-url:disabled { background: #07090C; color: #475569; cursor: not-allowed; }"
+    },
+    {
+      "name": "Live Status Pill",
+      "kind": "chip",
+      "refersTo": null,
+      "description": "Read-only live status on dark surfaces. Green dot with pulse animation. Never interactive.",
+      "html": "<span class=\"ds-pill-live\"><span class=\"ds-dot-live\"></span>Live</span>",
+      "css": ".ds-pill-live { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px; background: rgba(16,185,129,0.12); border: 1px solid rgba(16,185,129,0.28); font-family: Inter, sans-serif; font-size: 12px; font-weight: 500; color: #34D399; } .ds-dot-live { width: 6px; height: 6px; border-radius: 50%; background: #10B981; box-shadow: 0 0 0 3px rgba(16,185,129,0.18); animation: dot-pulse 2s ease-in-out infinite; flex-shrink: 0; } @keyframes dot-pulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(0.85); } }"
+    },
+    {
+      "name": "Active Nav Item",
+      "kind": "nav",
+      "refersTo": "nav-item-active",
+      "description": "Sidebar navigation item in active state. Cyan wash fill + cyan text. Committed: the fill, not just the color.",
+      "html": "<nav class=\"ds-sidebar\"><a class=\"ds-nav-item ds-nav-item--active\" href=\"#\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\"><rect x=\"2\" y=\"2\" width=\"5\" height=\"6\" rx=\"1\"/><rect x=\"9\" y=\"2\" width=\"5\" height=\"4\" rx=\"1\"/><rect x=\"2\" y=\"10\" width=\"5\" height=\"4\" rx=\"1\"/><rect x=\"9\" y=\"8\" width=\"5\" height=\"6\" rx=\"1\"/></svg><span>Monitors</span></a><a class=\"ds-nav-item\" href=\"#\"><svg width=\"16\" height=\"16\" viewBox=\"0 0 16 16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.7\"><path d=\"M3 6a5 5 0 1 1 10 0v3l1.5 2.5h-13L3 9V6z\"/><path d=\"M6.5 13a1.5 1.5 0 0 0 3 0\"/></svg><span>Alerts</span></a></nav>",
+      "css": ".ds-sidebar { display: flex; flex-direction: column; gap: 2px; padding: 8px; background: #05070A; width: 220px; } .ds-nav-item { display: flex; align-items: center; gap: 10px; height: 36px; padding: 0 12px; border-radius: 8px; font-family: Inter, sans-serif; font-size: 13.5px; font-weight: 500; color: #94A3B8; text-decoration: none; transition: background 0.12s ease, color 0.12s ease; } .ds-nav-item:hover { background: rgba(255,255,255,0.04); color: #CBD5E1; } .ds-nav-item--active { background: rgba(6,182,212,0.15); color: #06B6D4; } .ds-nav-item--active:hover { background: rgba(6,182,212,0.22); }"
+    },
+    {
+      "name": "Filter Pills (Active)",
+      "kind": "chip",
+      "refersTo": "filter-pill-active",
+      "description": "Interactive filter tabs. Default barely visible; active shows committed cyan wash.",
+      "html": "<div class=\"ds-filter-group\"><button class=\"ds-filter\">All</button><button class=\"ds-filter ds-filter--active\">Active</button><button class=\"ds-filter\">Paused</button></div>",
+      "css": ".ds-filter-group { display: flex; gap: 6px; } .ds-filter { display: inline-flex; align-items: center; height: 30px; padding: 0 12px; border: 1px solid rgba(255,255,255,0.08); border-radius: 999px; background: transparent; font-family: Inter, sans-serif; font-size: 13px; font-weight: 500; color: #64748B; cursor: pointer; transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease; } .ds-filter:hover { background: rgba(255,255,255,0.04); color: #94A3B8; } .ds-filter--active { background: rgba(6,182,212,0.15); color: #06B6D4; border-color: rgba(6,182,212,0.25); } .ds-filter--active:hover { background: rgba(6,182,212,0.22); }"
+    },
+    {
+      "name": "Diff Highlight",
+      "kind": "custom",
+      "refersTo": null,
+      "description": "The signature display element. Inline before/after comparison. Background tint is the full annotation.",
+      "html": "<p class=\"ds-diff-prose\">Price changed from <span class=\"ds-diff-del\">$49/mo</span> to <span class=\"ds-diff-add\">$39/mo</span> on the Enterprise tier.</p>",
+      "css": ".ds-diff-prose { font-family: Inter, sans-serif; font-size: 14.5px; color: #CBD5E1; line-height: 1.6; margin: 0; } .ds-diff-add { display: inline; background: rgba(16,185,129,0.14); color: #34D399; border-radius: 4px; padding: 1px 6px; } .ds-diff-del { display: inline; background: rgba(239,68,68,0.14); color: #F87171; text-decoration: line-through; text-decoration-thickness: 1.5px; border-radius: 4px; padding: 1px 6px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Signal Room",
+    "overview": "The room is dark. Not because darkness looks good, but because that is when people use this tool. A startup founder at 9pm glancing at a monitor dashboard to check if the alert means a competitor dropped a price or just swapped a banner. The surfaces are dark because the data must be the brightest thing in the room.\n\nThis is a dark-first, Committed-color system. Deep surfaces, Electric Cyan carrying 20-30% visual weight across active states. The motion language is the system's identity: one entrance grammar applied everywhere — a clip-path sweep, left to right, 350ms ease-out-expo, 60ms stagger per row. When you open a page and every row of monitors uncloaks, that IS SonarDiff.\n\nThis system rejects: the SaaS-cream card grid, the neon hacker aesthetic, enterprise navigation sprawl, and consumer-app playfulness.",
+    "keyCharacteristics": [
+      "Dark-first: three-layer surface stack (Chrome #05070A / Base #07090C / Card #0F172A)",
+      "Committed color: Electric Cyan at 20-30% visual presence. Active states have fill, not just text.",
+      "Motion as identity: clip-path sweep is the one entrance grammar. No other entrance animation.",
+      "Geist Mono for all technical values: URLs, percentages, counts, timestamps.",
+      "Elevation via surface stepping (darker to lighter), not shadows."
+    ],
+    "rules": [
+      { "name": "The Committed Voice Rule", "body": "Electric Cyan is no longer at ≤10%. Active nav items, filter pills, selected rows all get the cyan wash fill. 20-30% presence: committed, not restrained.", "section": "colors" },
+      { "name": "The Dark Stack Rule", "body": "Surfaces stack Chrome → Base → Card → Elevated. Never invert. Card is never a page background.", "section": "colors" },
+      { "name": "The Semantic-Only Rule", "body": "Green, Red, Amber communicate state, not decoration. A green button is a violation.", "section": "colors" },
+      { "name": "The Mono Gatekeeping Rule", "body": "Geist Mono is for data: URLs, percentages, counts, timestamps. Never for headings or creative effect.", "section": "typography" },
+      { "name": "The Dark Contrast Rule", "body": "Body text must be Ink Primary (#F1F5F9) or Ink Secondary (#CBD5E1) on dark. Ink Tertiary (#94A3B8) is for supporting data only.", "section": "typography" },
+      { "name": "The Lighter-Up Rule", "body": "Elevation goes toward lighter surfaces. Shadows are for popovers only. The accent glow is the one exception.", "section": "elevation" },
+      { "name": "The One-Glow Rule", "body": "Accent Glow is the only glow in the system. One element. On the CTA button and focused inputs only.", "section": "elevation" },
+      { "name": "The No-Nesting Rule", "body": "Cards may not contain other cards. Nested border-radius stacks are always wrong.", "section": "components" },
+      { "name": "The One Sweep Rule", "body": "Clip-path sweep is the only entrance animation. No fade-up, no scale-in, no blur-reveal as a list entrance on the same page.", "section": "components" }
+    ],
+    "dos": [
+      "Do use the clip-path sweep as the only entrance animation. Stagger at 60ms per row.",
+      "Do gate the sweep and all ambient motion behind prefers-reduced-motion: reduce.",
+      "Do use Electric Cyan for all active/selected states at 20-30% presence. Active fills, not just active text.",
+      "Do use Geist Mono for every technical value. Ink Tertiary on dark surfaces.",
+      "Do use the three-layer dark stack in order: Chrome → Base → Card → Elevated.",
+      "Do pair color status with a label or icon on dark surfaces.",
+      "Do keep button hover at translateY(-1px), 120ms ease-out-expo.",
+      "Do write system copy with no exclamation points. Calm, direct.",
+      "Do support RTL layout and Cairo font for Arabic locale.",
+      "Do show monitor row actions on hover only."
+    ],
+    "donts": [
+      "Don't use any entrance animation other than clip-path sweep. One grammar.",
+      "Don't apply the sweep to persistent chrome (sidebar, topbar, page shell).",
+      "Don't use bounce, elastic, or spring-physics easing. ease-out-expo only.",
+      "Don't recreate the SaaS-cream dashboard. Dark three-layer stack is the answer.",
+      "Don't use neon glow on non-CTA elements. One glow: accent CTA and focused inputs.",
+      "Don't build five-level navigation or stack modals. Two clicks maximum.",
+      "Don't use emoji as UI elements or consumer-app playfulness.",
+      "Don't use border-left/right greater than 1px as accent stripe.",
+      "Don't use gradient text.",
+      "Don't use hero-metric template inside the dashboard shell.",
+      "Don't use Green, Red, Amber for anything except diff text, errors, monitor status.",
+      "Don't nest cards inside cards.",
+      "Don't apply shadows to cards or rows at rest."
+    ]
+  }
+}
